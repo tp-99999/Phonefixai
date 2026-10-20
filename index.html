@@ -714,26 +714,26 @@
     <nav class="fixed bottom-0 left-0 right-0 z-40 bg-workbench-950/95 backdrop-blur-lg border-t border-slate-800/90 bottom-nav-safe">
         <div class="max-w-2xl mx-auto grid grid-cols-4 px-2 py-1.5">
             <!-- Tab 1: Scan -->
-            <button onclick="switchTab('scan')" id="nav-btn-scan" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-emerald-400 transition active:scale-95">
+            <button onclick="switchTab('scan')" id="nav-btn-scan" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-white transition active:scale-95">
                 <i class="fa-solid fa-camera text-lg"></i>
                 <span class="text-[11px] font-bold mt-1">Nhận Diện</span>
             </button>
 
             <!-- Tab 2: History -->
-            <button onclick="switchTab('history')" id="nav-btn-history" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition active:scale-95 relative">
+            <button onclick="switchTab('history')" id="nav-btn-history" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95 relative">
                 <i class="fa-solid fa-clock-rotate-left text-lg"></i>
                 <span class="text-[11px] font-medium mt-1">Lịch Sử</span>
                 <span id="navHistoryCount" class="hidden absolute top-1 right-6 bg-emerald-500 text-slate-950 text-[9px] font-extrabold px-1.5 rounded-full">0</span>
             </button>
 
             <!-- Tab 3: Repair Tools -->
-            <button onclick="switchTab('tools')" id="nav-btn-tools" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition active:scale-95">
+            <button onclick="switchTab('tools')" id="nav-btn-tools" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95">
                 <i class="fa-solid fa-toolbox text-lg"></i>
                 <span class="text-[11px] font-medium mt-1">Công Cụ Thợ</span>
             </button>
 
             <!-- Tab 4: Settings & API Key -->
-            <button onclick="switchTab('settings')" id="nav-btn-settings" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition active:scale-95">
+            <button onclick="switchTab('settings')" id="nav-btn-settings" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95">
                 <i class="fa-solid fa-key text-lg"></i>
                 <span class="text-[11px] font-medium mt-1">Key & Cài App</span>
             </button>
@@ -814,14 +814,23 @@
             tabs.forEach(t => {
                 const section = document.getElementById(`tab-${t}`);
                 const navBtn = document.getElementById(`nav-btn-${t}`);
+                const labelSpan = navBtn.querySelector('span:not(#navHistoryCount)');
                 if (t === tabName) {
                     section.classList.remove('hidden');
-                    navBtn.classList.remove('text-slate-400');
-                    navBtn.classList.add('text-emerald-400');
+                    navBtn.classList.remove('text-slate-500', 'text-slate-400', 'text-emerald-400');
+                    navBtn.classList.add('text-white');
+                    if (labelSpan) {
+                        labelSpan.classList.remove('font-medium');
+                        labelSpan.classList.add('font-bold');
+                    }
                 } else {
                     section.classList.add('hidden');
-                    navBtn.classList.remove('text-emerald-400');
-                    navBtn.classList.add('text-slate-400');
+                    navBtn.classList.remove('text-white', 'text-emerald-400', 'text-slate-400');
+                    navBtn.classList.add('text-slate-500');
+                    if (labelSpan) {
+                        labelSpan.classList.remove('font-bold');
+                        labelSpan.classList.add('font-medium');
+                    }
                 }
             });
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1722,7 +1731,7 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                const prompt = `Bạn là giảng viên dạy sửa chữa điện thoại di động. Học viên đang tháo/sửa máy "${modelName}" (Mã: ${currentAnalysisData?.modelCodes || ''}) và hỏi: "${question}". Hãy trả lời ngắn gọn, súc tích, đi thẳng vào kỹ thuật thực tế (nhiệt độ, vị trí cáp/IC, kinh nghiệm tránh rủi ro) bằng tiếng Việt dễ hiểu.`;
+                const prompt = `Bạn là giảng viên dạy sửa chữa điện thoại di động thực chiến. Học viên đang tháo/sửa máy "${modelName}" (Mã: ${currentAnalysisData?.modelCodes || ''}) và hỏi: "${question}". Hãy trả lời ngắn gọn, súc tích, chia từng mục rõ ràng, đi thẳng vào kỹ thuật thực tế (nhiệt độ, vị trí cáp/IC, kinh nghiệm tránh rủi ro đền máy) bằng tiếng Việt dễ hiểu.`;
 
                 const { data } = await callGeminiWithAutoFallback(
                     activeKeyObj.key,
@@ -1732,8 +1741,13 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
 
                 const bubble = document.getElementById(loadingId);
                 if (bubble) {
-                    bubble.className = 'bg-workbench-950 border border-slate-800 rounded-xl p-3 text-slate-200 mr-4 leading-relaxed whitespace-pre-line';
-                    bubble.innerHTML = `<span class="font-bold block text-[10px] uppercase text-cyan-400 mb-1"><i class="fa-solid fa-user-gear mr-1"></i>Kỹ thuật viên AI:</span>${escapeHtml(reply)}`;
+                    bubble.className = 'bg-workbench-950 border border-slate-800 rounded-xl p-3.5 text-slate-200 mr-3 leading-relaxed space-y-1.5';
+                    bubble.innerHTML = `
+                        <span class="font-bold block text-[10px] uppercase text-cyan-400 mb-1.5 pb-1 border-b border-slate-800/80">
+                            <i class="fa-solid fa-user-gear mr-1"></i>Kỹ thuật viên AI:
+                        </span>
+                        <div class="space-y-1.5 text-xs leading-relaxed">${renderMarkdown(reply)}</div>
+                    `;
                 }
             } catch (e) {
                 const bubble = document.getElementById(loadingId);
@@ -1742,6 +1756,88 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
                 sendBtn.disabled = false;
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
+        }
+
+        /********************************************************************
+         * 10. MARKDOWN FORMATTER FOR AI CHAT REPLIES
+         ********************************************************************/
+        function formatInlineMarkdown(escapedLine) {
+            return escapedLine
+                // Inline code `...`
+                .replace(/`([^`]+)`/g, '<code class="font-mono text-[11px] text-cyan-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700/80">$1</code>')
+                // Bold **...**
+                .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-bold">$1</strong>')
+                // Bold __...__
+                .replace(/__([^_]+)__/g, '<strong class="text-white font-bold">$1</strong>')
+                // Italic *...* (single asterisk not adjacent to space)
+                .replace(/(^|[^*])\*([^*\s][^*]*)\*(?!\*)/g, '$1<em class="text-slate-300 italic">$2</em>');
+        }
+
+        function renderMarkdown(rawText) {
+            if (!rawText) return '';
+            // Escape HTML first to prevent XSS, then parse Markdown syntax
+            const safeText = escapeHtml(rawText).replace(/\*\*\s*\n\s*/g, '** ');
+            const lines = safeText.split(/\r?\n/);
+            const htmlParts = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+
+                if (!line) {
+                    continue;
+                }
+
+                // Horizontal Rule (--- or ***)
+                if (/^(-{3,}|\*{3,})$/.test(line)) {
+                    htmlParts.push('<hr class="border-slate-800 my-2">');
+                    continue;
+                }
+
+                // Headings: ####, ###, ##, #
+                const headingMatch = line.match(/^(#{1,4})\s+(.+)$/);
+                if (headingMatch) {
+                    const level = headingMatch[1].length;
+                    const content = formatInlineMarkdown(headingMatch[2]);
+                    if (level <= 2) {
+                        htmlParts.push(`<div class="font-extrabold text-emerald-400 text-xs sm:text-sm pt-2 pb-0.5 border-b border-slate-800/70">${content}</div>`);
+                    } else {
+                        htmlParts.push(`<div class="font-bold text-amber-300 text-xs pt-1.5">${content}</div>`);
+                    }
+                    continue;
+                }
+
+                // Bullet points: * item or - item or • item
+                const bulletMatch = line.match(/^([*\-•])\s+(.+)$/);
+                if (bulletMatch) {
+                    const content = formatInlineMarkdown(bulletMatch[2]);
+                    htmlParts.push(`
+                        <div class="flex items-start gap-2 pl-1">
+                            <span class="text-emerald-400 font-bold select-none mt-0.5">•</span>
+                            <span class="flex-1 text-slate-200">${content}</span>
+                        </div>
+                    `);
+                    continue;
+                }
+
+                // Numbered list: 1. item, 2. item
+                const numMatch = line.match(/^(\d+[.)])\s+(.+)$/);
+                if (numMatch) {
+                    const badge = numMatch[1];
+                    const content = formatInlineMarkdown(numMatch[2]);
+                    htmlParts.push(`
+                        <div class="flex items-start gap-1.5 pl-0.5 pt-0.5">
+                            <span class="font-mono font-bold text-cyan-400 shrink-0">${badge}</span>
+                            <span class="flex-1 text-slate-200">${content}</span>
+                        </div>
+                    `);
+                    continue;
+                }
+
+                // Normal paragraph line
+                htmlParts.push(`<p class="text-slate-200">${formatInlineMarkdown(line)}</p>`);
+            }
+
+            return htmlParts.join('');
         }
 
         /********************************************************************
