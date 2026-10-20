@@ -114,12 +114,9 @@
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-900/40 border border-emerald-400/30 shrink-0">
                     <i class="fa-solid fa-screwdriver-wrench text-slate-950 text-lg"></i>
                 </div>
-                <div>
-                    <div class="flex items-center gap-1.5">
-                        <h1 class="font-extrabold text-base tracking-tight text-white leading-none">PhoneFix <span class="text-emerald-400">AI</span></h1>
-                        <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 border border-slate-700 font-semibold">PRO</span>
-                    </div>
-                    <p id="headerModelSubtext" class="text-[10px] font-mono text-slate-400 mt-0.5 truncate max-w-[165px] sm:max-w-xs">Model: Tự động (Auto)</p>
+                <div class="flex items-center gap-1.5">
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-white leading-none">PhoneFix <span class="text-emerald-400">AI</span></h1>
+                    <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 border border-slate-700 font-semibold">PRO</span>
                 </div>
             </div>
 
@@ -154,7 +151,7 @@
                     <i class="fa-solid fa-key text-amber-400 mt-0.5 text-base"></i>
                     <div class="text-xs text-slate-200 leading-relaxed">
                         <p class="font-bold text-amber-300">Chưa cấu hình Gemini API Key!</p>
-                        <p class="text-slate-300 mt-0.5">Hãy thêm API Key miễn phí của Google để chụp ảnh nhận diện máy, hoặc bấm <b>"Xem Bản Mẫu"</b> bên dưới để trải nghiệm trước.</p>
+                        <p class="text-slate-300 mt-0.5">Hãy thêm API Key miễn phí của Google trong mục <b>Key & Cài App</b> để bắt đầu chụp ảnh nhận diện máy.</p>
                     </div>
                 </div>
                 <button onclick="switchTab('settings')" class="shrink-0 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition active:scale-95">
@@ -169,9 +166,6 @@
                         <span class="w-2 h-5 rounded-full bg-emerald-500"></span>
                         <h2 class="font-bold text-sm sm:text-base text-white">Chụp Hoặc Tải Ảnh Điện Thoại</h2>
                     </div>
-                    <button onclick="loadDemoAnalysis()" class="text-xs font-medium text-cyan-400 hover:text-cyan-300 bg-cyan-950/60 border border-cyan-800/60 px-2.5 py-1 rounded-lg flex items-center gap-1 active:scale-95 transition">
-                        <i class="fa-solid fa-flask"></i> Xem Bản Mẫu
-                    </button>
                 </div>
 
                 <!-- Hidden File Inputs for Camera & Gallery -->
@@ -721,7 +715,7 @@
         <div class="max-w-2xl mx-auto grid grid-cols-4 px-2 py-1.5">
             <!-- Tab 1: Scan -->
             <button onclick="switchTab('scan')" id="nav-btn-scan" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-emerald-400 transition active:scale-95">
-                <i class="fa-solid fa-camera-viewfinder text-lg"></i>
+                <i class="fa-solid fa-camera text-lg"></i>
                 <span class="text-[11px] font-bold mt-1">Nhận Diện</span>
             </button>
 
@@ -1216,7 +1210,6 @@
             const headerBtn = document.getElementById('headerKeyStatusBtn');
             const headerDot = document.getElementById('headerKeyDot');
             const headerText = document.getElementById('headerKeyText');
-            const headerModelSubtext = document.getElementById('headerModelSubtext');
             const resolvedBadge = document.getElementById('resolvedActiveModelBadge');
             const noKeyBanner = document.getElementById('noKeyWarningBanner');
 
@@ -1225,11 +1218,6 @@
             const modelSetting = getSelectedModelSetting();
             const activeModelId = getInitialModelToTry();
 
-            if (headerModelSubtext) {
-                headerModelSubtext.textContent = modelSetting === 'auto'
-                    ? `Model: ${activeModelId} (Auto)`
-                    : `Model: ${activeModelId}`;
-            }
             if (resolvedBadge) {
                 resolvedBadge.textContent = modelSetting === 'auto'
                     ? `${activeModelId} (Tự động)`
@@ -1400,7 +1388,7 @@
 
             const activeKeyObj = getActiveApiKeyObj();
             if (!activeKeyObj) {
-                showToast('Bạn chưa thêm Gemini API Key! Hãy thêm Key hoặc bấm "Xem Bản Mẫu".', 'warning');
+                showToast('Bạn chưa thêm Gemini API Key! Hãy thêm Key để phân tích ảnh.', 'warning');
                 switchTab('settings');
                 return;
             }
@@ -1754,49 +1742,6 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
                 sendBtn.disabled = false;
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
-        }
-
-        /********************************************************************
-         * 10. DEMO / SAMPLE MODE (TEST APP WITHOUT API KEY)
-         ********************************************************************/
-        function loadDemoAnalysis() {
-            const sampleData = {
-                modelName: "Xiaomi Redmi Note 8",
-                confidence: "Cao (Bản Mẫu Demo)",
-                confidenceReason: "Nhận diện qua mặt lưng kính chuyển sắc (Tím/Xanh), logo Redmi đặt dọc góc trái dưới, cụm 4 camera dọc góc trái và cảm biến vân tay tròn ở giữa mặt lưng.",
-                modelCodes: "M1908C3JG, M1908C3JH, M1908C3JE",
-                repairGuide: {
-                    entryMethod: "Khò nhiệt tách Nắp Lưng kính phía sau (Back Cover) trước",
-                    heatTemp: "80°C - 85°C trên bàn nhiệt trong 2 - 3 phút. Lưu ý màn hình dòng này là IPS LCD có phản quang nên hạn chế nhỏ quá nhiều cồn/530 tràn vào mép màn hình.",
-                    flexCableWarnings: "CẢNH BÁO ĐỨT CÁP: Có dây cáp Cảm Biến Vân Tay rất ngắn nối từ mặt lưng vào mainboard! Khi tách nắp lưng xong, TUYỆT ĐỐI không giật mạnh nắp lưng ra ngay mà phải mở nghiêng để tháo socket vân tay trước.",
-                    disassemblySteps: [
-                        "Tháo khay SIM và tắt nguồn máy hoàn toàn.",
-                        "Đặt mặt lưng lên bàn nhiệt 80°C trong 2 phút, dùng lá nhựa mỏng lách đều 4 cạnh nắp lưng (tránh đâm sâu vào giữa lưng nơi có cáp vân tay).",
-                        "Nghiêng nhẹ nắp lưng, tháo lồng sắt đè socket vân tay và ngắt kết nối cáp vân tay để tách rời nắp lưng.",
-                        "Tháo các ốc cố định lồng bảo vệ main, ngắt socket Pin (BN46) đầu tiên trước khi tháo cáp màn hình và cáp nối cụm sạc."
-                    ],
-                    commonIssues: "1. Liệt cảm ứng hoặc mất đèn màn hình do vào nước phần cổ cáp dưới cằm. 2. Lỗi mất sóng / Không có dịch vụ do chết IC công suất hoặc trung tần (SDR660). 3. Phù pin BN46 làm bung nắp lưng sau thời gian dài sử dụng."
-                },
-                specs: {
-                    display: "IPS LCD 6.3 inch, Full HD+ (1080 x 2340), Có lớp phản quang (Cẩn thận khi dùng dung dịch tách keo)",
-                    battery: "4000 mAh (Mã pin: BN46), Sạc 18W, Chân sạc USB Type-C nằm trên cụm bo sạc rời bên dưới",
-                    hardware: "Qualcomm Snapdragon 665, RAM 4GB/6GB, Mainboard chữ C 1 tầng dễ sửa chữa, lưng kính Gorilla Glass 5"
-                },
-                similarModels: [
-                    {
-                        name: "Xiaomi Redmi Note 8T",
-                        difference: "Có thêm NFC, viền dưới (cằm) dày hơn một chút, khung màn hình không lắp chung hoàn toàn với Redmi Note 8 thường."
-                    },
-                    {
-                        name: "Xiaomi Redmi Note 7",
-                        difference: "Chỉ có cụm 2 camera sau thay vì 4 camera như Redmi Note 8, dùng mã pin BN4A khác với BN46."
-                    }
-                ]
-            };
-
-            currentAnalysisData = sampleData;
-            renderAnalysisResult(sampleData);
-            showToast('Đã nạp dữ liệu mẫu: Xiaomi Redmi Note 8!', 'info');
         }
 
         /********************************************************************
