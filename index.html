@@ -115,48 +115,47 @@
                     <i class="fa-solid fa-screwdriver-wrench text-slate-950 text-lg"></i>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-white leading-none">PhoneFix <span class="text-emerald-400">AI</span></h1>
-                    <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 border border-slate-700 font-semibold">PRO</span>
-                </div>
-            </div>
-
-            <!-- Right Status Badge & Quick Key Button -->
-            <div class="flex items-center gap-2">
-                <!-- API Key Status Pill -->
-                <button onclick="switchTab('settings')" id="headerKeyStatusBtn" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium border transition-all active:scale-95">
-                    <span id="headerKeyDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                    <span id="headerKeyText" class="truncate max-w-[115px]">Chưa có Key</span>
-                </button>
-
-                <!-- Install PWA Quick Button (Shown when installable) -->
-                <button id="headerInstallBtn" onclick="triggerPwaInstall()" class="hidden items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 active:scale-95 transition">
-                    <i class="fa-solid fa-download"></i>
-                    <span class="hidden sm:inline">Cài App</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- ================= MAIN WORKSPACE CONTAINER ================= -->
-    <main class="flex-1 max-w-2xl w-full mx-auto px-3.5 pt-4 pb-safe">
-
-        <!-- =============================================================== -->
-        <!-- TAB 1: NHẬN DIỆN & PHÂN TÍCH MÁY (SCAN / IDENTIFY)              -->
-        <!-- =============================================================== -->
-        <section id="tab-scan" class="space-y-4">
-            
-            <!-- Banner Reminder if No API Key is set -->
-            <div id="noKeyWarningBanner" class="hidden bg-amber-500/10 border border-amber-500/40 rounded-2xl p-3.5 flex items-start justify-between gap-3">
-                <div class="flex items-start gap-2.5">
-                    <i class="fa-solid fa-key text-amber-400 mt-0.5 text-base"></i>
-                    <div class="text-xs text-slate-200 leading-relaxed">
-                        <p class="font-bold text-amber-300">Chưa cấu hình Gemini API Key!</p>
-                        <p class="text-slate-300 mt-0.5">Hãy thêm API Key miễn phí của Google trong mục <b>Key & Cài App</b> để bắt đầu chụp ảnh nhận diện máy.</p>
-                    </div>
-                </div>
+                <!--button onclick="switchTab('settings')" class="shrink-0 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition active:scale-95">
+                    Nhập Key
+                </button-->
                 <button onclick="switchTab('settings')" class="shrink-0 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition active:scale-95">
                     Nhập Key
                 </button>
+            </div>
+
+            <!-- Direct Model Name / Code Lookup Card (Fallback & Direct Search without Photo) -->
+            <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-5 rounded-full bg-cyan-400"></span>
+                        <h2 class="font-bold text-sm sm:text-base text-white">Tra Cứu Trực Tiếp Bằng Tên Máy / Mã Model</h2>
+                    </div>
+                    <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold">Dự phòng</span>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Nhập thẳng tên máy hoặc mã in trên vỏ/khay SIM (nếu không cần chụp ảnh hoặc khi ảnh quét chưa chuẩn):
+                </p>
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-magnifying-glass-chart absolute left-3.5 top-3 text-slate-500 text-xs"></i>
+                        <input type="text" id="directModelSearchInput" 
+                            placeholder="VD: Samsung Galaxy A20, Redmi Note 8, SM-A205F..." 
+                            onkeydown="if(event.key === 'Enter') analyzePhoneByName()"
+                            class="w-full bg-workbench-950 border border-slate-800 focus:border-cyan-400 rounded-xl pl-9 pr-3 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 outline-none transition">
+                    </div>
+                    <button id="directSearchBtn" onclick="analyzePhoneByName()" 
+                        class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-extrabold text-xs sm:text-sm shrink-0 flex items-center gap-1.5 shadow-lg shadow-cyan-950/50 transition active:scale-95">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Tìm Máy</span>
+                    </button>
+                </div>
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-[11px] no-scrollbar">
+                    <span class="text-slate-500 shrink-0">Gợi ý:</span>
+                    <button onclick="analyzePhoneByName('Samsung Galaxy A20')" class="shrink-0 px-2 py-0.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">Galaxy A20</button>
+                    <button onclick="analyzePhoneByName('Xiaomi Redmi Note 8')" class="shrink-0 px-2 py-0.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">Redmi Note 8</button>
+                    <button onclick="analyzePhoneByName('iPhone 12 Pro Max')" class="shrink-0 px-2 py-0.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">iPhone 12 Pro Max</button>
+                    <button onclick="analyzePhoneByName('Oppo A54')" class="shrink-0 px-2 py-0.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">Oppo A54</button>
+                </div>
             </div>
 
             <!-- Image Capture & Upload Card -->
@@ -166,6 +165,7 @@
                         <span class="w-2 h-5 rounded-full bg-emerald-500"></span>
                         <h2 class="font-bold text-sm sm:text-base text-white">Chụp Hoặc Tải Ảnh Điện Thoại</h2>
                     </div>
+                    <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-700/50 px-2 py-0.5 rounded-md">Forensic HD 1600px</span>
                 </div>
 
                 <!-- Hidden File Inputs for Camera & Gallery -->
@@ -214,80 +214,80 @@
                             <i class="fa-solid fa-trash-can"></i> Đổi ảnh
                         </button>
                     </div>
-                </div>
-
-                <!-- Optional Technician Context Input -->
-                <div class="mt-3.5">
-                    <label for="techNotesInput" class="block text-xs font-medium text-slate-400 mb-1.5">
-                        <i class="fa-solid fa-comment-medical text-emerald-400 mr-1"></i> Ghi chú thêm cho AI (Tùy chọn):
-                    </label>
-                    <input type="text" id="techNotesInput" placeholder="VD: Mặt lưng kính nhám, chân sạc Type-C, máy bị liệt cảm ứng..." 
-                        class="w-full bg-workbench-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition">
-                </div>
-
-                <!-- Primary Analyze Action Button -->
-                <button id="analyzeBtn" onclick="analyzePhoneImage()" class="mt-3.5 w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 transition active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i class="fa-solid fa-microchip text-base"></i>
-                    <span>PHÂN TÍCH TÊN MÁY & HƯỚNG DẪN THÁO LẮP</span>
-                </button>
-
-                <!-- Photography Tip for Repair Students -->
-                <p class="text-[11px] text-slate-400 mt-2.5 text-center">
-                    <i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i> Mẹo: Chụp rõ <b>cụm camera sau</b>, <b>mặt lưng</b>, hoặc dòng chữ nhỏ ở <b>khay SIM / nắp lưng</b> để AI báo chuẩn mã máy nhất.
-                </p>
-            </div>
-
-            <!-- Loading Skeleton Status during Gemini Vision Call -->
-            <div id="loadingStatusCard" class="hidden bg-workbench-900 border border-emerald-500/40 rounded-2xl p-5 text-center space-y-3 scanning-border">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                    <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-white text-sm" id="loadingStepTitle">Đang gửi ảnh tới Chuyên Gia Gemini AI...</h3>
-                    <p class="text-xs text-slate-400 mt-1" id="loadingStepDesc">Đang đối chiếu cụm camera, khung viền, vị trí cáp và sơ đồ tháo máy...</p>
-                </div>
-            </div>
-
-            <!-- =============================================================== -->
-            <!-- AI ANALYSIS RESULTS CONTAINER (Populated Dynamically)           -->
-            <!-- =============================================================== -->
-            <div id="analysisResultContainer" class="hidden space-y-4">
-                
-                <!-- 1. Primary Model Identification Card -->
-                <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none"></div>
-                    
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <span class="text-[11px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">
-                            <i class="fa-solid fa-check-double mr-1"></i> Kết Quả Nhận Diện
+                    <!-- Confidence Reasoning / Forensic Evidence -->
+                    <div class="mt-2.5 bg-workbench-950/80 p-2.5 rounded-xl border border-slate-800/80 space-y-1">
+                        <span class="text-[10px] font-mono uppercase text-emerald-400 font-bold block">
+                            <i class="fa-solid fa-magnifying-glass-location mr-1"></i> Bằng chứng nhận diện & Đối chiếu ngoại hình:
                         </span>
-                        <span id="resConfidenceBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                            Độ chính xác: Cao
-                        </span>
+                        <p id="resConfidenceReason" class="text-xs text-slate-300 leading-relaxed">
+                            Nhận diện qua cụm 5 mắt camera sau tách rời không viền bao quanh, khung vuông vức có khe bút S-Pen ở cạnh đáy.
+                        </p>
                     </div>
 
-                    <!-- Detected Model Name + Copy Button -->
-                    <div class="flex items-start justify-between gap-2 mt-1">
-                        <h2 id="resModelName" class="text-xl sm:text-2xl font-extrabold text-white tracking-tight leading-snug">
-                            Samsung Galaxy S22 Ultra 5G
-                        </h2>
-                        <button onclick="copyModelName()" title="Sao chép tên máy" class="shrink-0 p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center gap-1 border border-slate-700 active:scale-95 transition">
-                            <i class="fa-regular fa-copy"></i> <span class="text-[11px]">Copy</span>
-                        </button>
+                    <!-- Quick Re-search / Correction Bar if Image Scan was Wrong -->
+                    <div class="mt-3 pt-3 border-t border-slate-800/90 space-y-2">
+                        <label for="wrongModelCorrectionInput" class="block text-[11px] font-semibold text-amber-300">
+                            <i class="fa-solid fa-rotate text-amber-400 mr-1"></i> Quét sai tên máy? Nhập lại tên đúng hoặc chọn nhanh bên dưới:
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="text" id="wrongModelCorrectionInput" 
+                                placeholder="Nhập tên máy đúng (VD: Galaxy A30, Redmi Note 8T...)" 
+                                onkeydown="if(event.key === 'Enter') triggerCorrectionSearch()"
+                                class="flex-1 bg-workbench-950 border border-slate-700 focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none">
+                            <button onclick="triggerCorrectionSearch()" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shrink-0 transition active:scale-95">
+                                Tra Lại
+                            </button>
+                        </div>
+                        <!-- 1-Click Switch Chips for Similar Looking Models -->
+                        <div id="resQuickSwitchSimilarChips" class="flex items-center gap-1.5 flex-wrap pt-0.5">
+                            <!-- Dynamically populated from similarModels -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1B. TRUSTED SOURCE VERIFICATION & STANDARD PART CODES CARD -->
+                <div class="bg-workbench-900 border border-cyan-500/40 rounded-2xl p-4 shadow-xl space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 flex items-center justify-center">
+                                <i class="fa-solid fa-shield-check"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm sm:text-base text-white">Kiểm Chứng Nguồn & Mã Linh Kiện Chuẩn</h3>
+                                <p class="text-[11px] text-slate-400">Đối chiếu chéo trước khi đặt mua màn hình, pin, cáp</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Hardware Model Codes (Crucial for ordering screens/flex cables) -->
-                    <div class="mt-2.5 flex items-center flex-wrap gap-1.5">
-                        <span class="text-xs text-slate-400">Mã Model / Phiên bản:</span>
-                        <span id="resModelCodes" class="font-mono text-xs text-cyan-300 bg-cyan-950/60 border border-cyan-800/60 px-2 py-0.5 rounded-md">
-                            SM-S908B, SM-S908U, SM-S908E
+                    <!-- Standard Part Codes Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                        <div class="bg-workbench-950 border border-slate-800 rounded-xl p-3">
+                            <span class="text-[11px] text-slate-400 block font-medium">
+                                <i class="fa-solid fa-car-battery text-emerald-400 mr-1"></i> Mã Pin Chuẩn (Battery Code):
+                            </span>
+                            <p id="resBatteryCode" class="font-mono font-bold text-sm text-emerald-300 mt-1">
+                                Đang cập nhật
+                            </p>
+                        </div>
+                        <div class="bg-workbench-950 border border-slate-800 rounded-xl p-3">
+                            <span class="text-[11px] text-slate-400 block font-medium">
+                                <i class="fa-solid fa-layer-group text-cyan-400 mr-1"></i> Chuẩn Màn Hình & Cổ Cáp:
+                            </span>
+                            <p id="resScreenCompatibility" class="font-bold text-xs text-cyan-200 mt-1 leading-relaxed">
+                                Đang cập nhật
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 1-Click Trusted Hardware Database Verification Buttons -->
+                    <div>
+                        <span class="text-[11px] font-semibold text-slate-400 block mb-2">
+                            <i class="fa-solid fa-globe text-cyan-400 mr-1"></i> Đối chiếu thông số gốc trên cơ sở dữ liệu quốc tế:
                         </span>
+                        <div id="resTrustedSourcesGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <!-- Populated dynamically via renderTrustedSourcesInto(modelName, modelCodes) -->
+                        </div>
                     </div>
-
-                    <!-- Confidence Reasoning -->
-                    <p id="resConfidenceReason" class="mt-2.5 text-xs text-slate-300 bg-workbench-950/80 p-2.5 rounded-xl border border-slate-800/80 leading-relaxed">
-                        Nhận diện qua cụm 5 mắt camera sau tách rời không viền bao quanh, khung vuông vức có khe bút S-Pen ở cạnh đáy.
-                    </p>
                 </div>
 
                 <!-- 2. CRITICAL REPAIR & DISASSEMBLY WARNING CARD (Entry Method, Heat, Flex Cables, Step-by-Step) -->
@@ -434,7 +434,7 @@
                 <div class="bg-workbench-900 border border-emerald-500/30 rounded-2xl p-4 shadow-xl space-y-3">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-robot text-emerald-400"></i>
-                        <h3 class="font-bold text-sm text-white">Hỏi Thêm AI Về Máy Này</h3>
+                        <h3 class="font-bold text-sm text-white">Hỏi Thêm AI Về Pan Bệnh Của Máy Này</h3>
                     </div>
                     
                     <!-- Chat Conversation History for current phone -->
@@ -631,8 +631,9 @@
                     <select id="modelSelectDropdown" onchange="handleModelSelectionChange()" 
                         class="w-full bg-workbench-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-xs sm:text-sm text-white outline-none">
                         <option value="auto">✨ Tự động dò Model mới nhất (Khuyên dùng - Không lo lỗi Model)</option>
-                        <option value="gemini-3.0-flash">gemini-3.0-flash (Mới nhất cho Key mới)</option>
-                        <option value="gemini-3-flash-preview">gemini-3-flash-preview (Bản Gemini 3 Flash)</option>
+                        <option value="gemini-3.8-flash">gemini-3.8-flash (Model mới nhất Google khuyến nghị)</option>
+                        <option value="gemini-3.0-flash">gemini-3.0-flash (Bản Gemini 3.0 Flash)</option>
+                        <option value="gemini-3-flash-preview">gemini-3-flash-preview (Bản Gemini 3 Flash Preview)</option>
                         <option value="gemini-2.5-flash">gemini-2.5-flash (Bản 2.5 Flash)</option>
                         <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Siêu nhanh, tiết kiệm)</option>
                         <option value="gemini-2.5-pro">gemini-2.5-pro (Chuyên sâu cho pan khó)</option>
@@ -642,13 +643,27 @@
                     <!-- Status info of currently resolved model -->
                     <div class="bg-workbench-950/90 border border-slate-800/90 rounded-xl p-2.5 text-[11px] text-slate-400 flex items-center justify-between gap-2">
                         <span>Model thực tế đang hoạt động:</span>
-                        <span id="resolvedActiveModelBadge" class="font-mono font-semibold text-emerald-400">gemini-3.0-flash (Auto)</span>
+                        <span id="resolvedActiveModelBadge" class="font-mono font-semibold text-emerald-400">gemini-3.8-flash (Auto)</span>
                     </div>
 
                     <!-- Custom Model ID Input (Hidden unless 'custom' selected) -->
                     <div id="customModelInputWrapper" class="hidden pt-1">
-                        <input type="text" id="customModelIdInput" oninput="saveCustomModelId()" placeholder="Nhập mã model (VD: gemini-3.0-flash)" 
+                        <input type="text" id="customModelIdInput" oninput="saveCustomModelId()" placeholder="Nhập mã model (VD: gemini-3.8-flash)" 
                             class="w-full bg-workbench-950 border border-cyan-500/50 rounded-xl px-3 py-2 text-xs font-mono text-cyan-300 outline-none">
+                    </div>
+                </div>
+
+                <!-- Backup & Restore JSON Data -->
+                <div class="pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+                    <span class="text-xs text-slate-400">Sao lưu Key & Lịch sử tra cứu:</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportBackupJson()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95">
+                            <i class="fa-solid fa-download"></i> Xuất Backup (.json)
+                        </button>
+                        <input type="file" id="restoreJsonInput" accept=".json,application/json" class="hidden" onchange="importBackupJson(event)">
+                        <button onclick="document.getElementById('restoreJsonInput').click()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95">
+                            <i class="fa-solid fa-upload"></i> Khôi phục
+                        </button>
                     </div>
                 </div>
             </div>
@@ -714,26 +729,30 @@
     <nav class="fixed bottom-0 left-0 right-0 z-40 bg-workbench-950/95 backdrop-blur-lg border-t border-slate-800/90 bottom-nav-safe">
         <div class="max-w-2xl mx-auto grid grid-cols-4 px-2 py-1.5">
             <!-- Tab 1: Scan -->
-            <button onclick="switchTab('scan')" id="nav-btn-scan" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-white transition active:scale-95">
+            <button onclick="switchTab('scan')" id="nav-btn-scan" class="relative flex flex-col items-center justify-center py-1.5 rounded-xl text-white transition active:scale-95">
+                <span id="nav-ind-scan" class="absolute -top-1.5 w-8 h-1 rounded-full bg-white shadow-[0_0_8px_#ffffff]"></span>
                 <i class="fa-solid fa-camera text-lg"></i>
                 <span class="text-[11px] font-bold mt-1">Nhận Diện</span>
             </button>
 
             <!-- Tab 2: History -->
-            <button onclick="switchTab('history')" id="nav-btn-history" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95 relative">
+            <button onclick="switchTab('history')" id="nav-btn-history" class="relative flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95">
+                <span id="nav-ind-history" class="hidden absolute -top-1.5 w-8 h-1 rounded-full bg-white shadow-[0_0_8px_#ffffff]"></span>
                 <i class="fa-solid fa-clock-rotate-left text-lg"></i>
                 <span class="text-[11px] font-medium mt-1">Lịch Sử</span>
                 <span id="navHistoryCount" class="hidden absolute top-1 right-6 bg-emerald-500 text-slate-950 text-[9px] font-extrabold px-1.5 rounded-full">0</span>
             </button>
 
             <!-- Tab 3: Repair Tools -->
-            <button onclick="switchTab('tools')" id="nav-btn-tools" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95">
-                <i class="fa-solid fa-toolbox text-lg"></i>
+            <button onclick="switchTab('tools')" id="nav-btn-tools" class="relative flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95">
+                <span id="nav-ind-tools" class="hidden absolute -top-1.5 w-8 h-1 rounded-full bg-white shadow-[0_0_8px_#ffffff]"></span>
+                <i class="fa-solid fa-briefcase text-lg"></i>
                 <span class="text-[11px] font-medium mt-1">Công Cụ Thợ</span>
             </button>
 
             <!-- Tab 4: Settings & API Key -->
-            <button onclick="switchTab('settings')" id="nav-btn-settings" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95">
+            <button onclick="switchTab('settings')" id="nav-btn-settings" class="relative flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95">
+                <span id="nav-ind-settings" class="hidden absolute -top-1.5 w-8 h-1 rounded-full bg-white shadow-[0_0_8px_#ffffff]"></span>
                 <i class="fa-solid fa-key text-lg"></i>
                 <span class="text-[11px] font-medium mt-1">Key & Cài App</span>
             </button>
@@ -759,6 +778,7 @@
 
         // Ordered fallback candidates (newest & most reliable first)
         const FALLBACK_MODEL_PRIORITY = [
+            'gemini-3.8-flash',
             'gemini-3.0-flash',
             'gemini-3-flash-preview',
             'gemini-2.5-flash',
@@ -782,6 +802,7 @@
             loadSavedSettingsUI();
             renderHistoryList();
             setManualModel('Redmi Note 8');
+            switchTab('scan');
         });
 
         // Listen for PWA Installable event
@@ -814,11 +835,13 @@
             tabs.forEach(t => {
                 const section = document.getElementById(`tab-${t}`);
                 const navBtn = document.getElementById(`nav-btn-${t}`);
-                const labelSpan = navBtn.querySelector('span:not(#navHistoryCount)');
+                const navInd = document.getElementById(`nav-ind-${t}`);
+                const labelSpan = navBtn.querySelector('span:not(#navHistoryCount):not([id^="nav-ind-"])');
                 if (t === tabName) {
                     section.classList.remove('hidden');
                     navBtn.classList.remove('text-slate-500', 'text-slate-400', 'text-emerald-400');
                     navBtn.classList.add('text-white');
+                    if (navInd) navInd.classList.remove('hidden');
                     if (labelSpan) {
                         labelSpan.classList.remove('font-medium');
                         labelSpan.classList.add('font-bold');
@@ -827,6 +850,7 @@
                     section.classList.add('hidden');
                     navBtn.classList.remove('text-white', 'text-emerald-400', 'text-slate-400');
                     navBtn.classList.add('text-slate-500');
+                    if (navInd) navInd.classList.add('hidden');
                     if (labelSpan) {
                         labelSpan.classList.remove('font-bold');
                         labelSpan.classList.add('font-medium');
@@ -903,7 +927,7 @@
             if (cachedWorking) {
                 return cachedWorking;
             }
-            return 'gemini-3.0-flash';
+            return 'gemini-3.8-flash';
         }
 
         /**
@@ -931,10 +955,11 @@
                     })
                     .map(m => m.name.replace(/^models\//, ''));
 
-                // Sort so flash models and newer versions (3.x > 2.5 > 2.0) come first
+                // Sort so flash models and newer versions (3.8 > 3.0 > 2.5 > 2.0) come first
                 supported.sort((a, b) => {
                     const score = (id) => {
                         let s = 0;
+                        if (id === 'gemini-3.8-flash') s += 1200;
                         if (id === 'gemini-3.0-flash') s += 1000;
                         if (id === 'gemini-3-flash-preview') s += 950;
                         if (id.includes('gemini-3')) s += 500;
@@ -1319,7 +1344,7 @@
         }
 
         /********************************************************************
-         * 6. IMAGE CAPTURE, CLIENT-SIDE COMPRESSION & PREVIEW
+         * 6. IMAGE CAPTURE, CLIENT-SIDE COMPRESSION (FORENSIC HD 1600PX) & PREVIEW
          ********************************************************************/
         function handleImageSelect(event) {
             const file = event.target.files[0];
@@ -1331,8 +1356,8 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    // Resize to max 1280px for fast upload & low token/bandwidth usage
-                    const MAX_DIM = 1280;
+                    // Resize to max 1600px (Forensic HD) to preserve tiny model codes on back cover & SIM tray
+                    const MAX_DIM = 1600;
                     let width = img.width;
                     let height = img.height;
 
@@ -1348,10 +1373,12 @@
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Export compressed JPEG (0.82 quality)
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                    // Export high-clarity JPEG (0.88 quality) for accurate OCR & camera ring inspection
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
                     currentCompressedBase64 = compressedDataUrl.split(',')[1];
 
                     // Create a tiny thumbnail (240px) for localStorage history
@@ -1369,7 +1396,7 @@
                     document.getElementById('compressionBadge').textContent = `Đã nén: ${originalSizeKB}KB → ${compressedSizeKB}KB`;
                     document.getElementById('captureButtonsContainer').classList.add('hidden');
                     document.getElementById('imagePreviewWrapper').classList.remove('hidden');
-                    showToast('Đã nạp ảnh! Bấm "Phân Tích Tên Máy" để bắt đầu.', 'info');
+                    showToast('Đã nạp ảnh HD! Bấm "Phân Tích Tên Máy" để bắt đầu.', 'info');
                 };
                 img.src = e.target.result;
             };
@@ -1387,11 +1414,132 @@
         }
 
         /********************************************************************
-         * 7. GEMINI VISION API CALL FOR REPAIR ANALYSIS (WITH AUTO-FALLBACK)
+         * 7. GEMINI VISION & DIRECT MODEL LOOKUP FOR REPAIR ANALYSIS
          ********************************************************************/
+        function getRepairJsonSchemaInstruction() {
+            return `{
+  "modelName": "Tên thương mại chính xác nhất của máy (VD: Samsung Galaxy A20, Xiaomi Redmi Note 8, iPhone 12 Pro Max)",
+  "confidence": "Cao / Trung bình / Thấp",
+  "confidenceReason": "Bằng chứng nhận diện qua ảnh (nêu rõ đặc điểm cụm camera, vị trí đèn flash, cảm biến vân tay, logo, chất liệu vỏ và điểm khác biệt giúp loại trừ các dòng máy giống nó)",
+  "modelCodes": "Tất cả các mã model phần cứng quốc tế/nội địa chuẩn xác (VD: SM-A205F, SM-A205FN, SM-A205G hoặc M1908C3JG, M1908C3JH)",
+  "batteryCode": "Mã Pin chuẩn in trên viên pin của dòng máy này (VD: EB-BA205ABU, BN46, BP41...)",
+  "screenCompatibility": "Loại màn hình (Super AMOLED / IPS LCD / PLS LCD), lưu ý cổ cáp và các dòng máy có thể dùng chung màn hình (nếu có)",
+  "repairGuide": {
+    "entryMethod": "Hướng tháo mở máy chuẩn kỹ thuật (VD: Khò nhiệt tách Nắp Lưng nhựa/kính sau HOẶC Tách từ Màn Hình trước)",
+    "heatTemp": "Nhiệt độ bàn nhiệt & thời gian khuyến nghị + lưu ý hóa chất (VD: 75°C - 85°C trong 2-3 phút, lưu ý màn IPS/PLS LCD có phản quang hay AMOLED)",
+    "flexCableWarnings": "CẢNH BÁO CỰC KỲ QUAN TRỌNG về vị trí cáp vân tay mặt lưng, cáp màn hình, cáp phím âm lượng/nguồn hoặc cáp nối main-sub dễ bị đứt khi lách mở máy",
+    "disassemblySteps": [
+      "Bước 1: Tháo khay SIM đầu tiên và tắt nguồn hoàn toàn.",
+      "Bước 2: Gia nhiệt nắp lưng/màn hình ở nhiệt độ phù hợp...",
+      "Bước 3: Lưu ý nhấc nhẹ nắp lưng để tháo lồng sắt/cáp vân tay trước khi nhấc hẳn nắp lưng ra.",
+      "Bước 4: Tháo ốc lồng main, cách ly socket Pin đầu tiên trước khi tháo cáp màn hình và camera."
+    ],
+    "commonIssues": "Các pan bệnh phần cứng hay gặp trên dòng máy này (VD: mất hiển thị, chạm áp sạc, lỗi IC nguồn/sóng, sọc màn...)"
+  },
+  "specs": {
+    "display": "Loại tấm nền (IPS LCD, PLS LCD hay Super AMOLED/OLED), kích thước (inch), độ phân giải, tần số quét",
+    "battery": "Dung lượng pin (mAh), mã pin chuẩn, công suất sạc (W), chuẩn chân sạc (Type-C, Micro-USB, Lightning)",
+    "hardware": "Vi xử lý (Chipset chuẩn xác), RAM/ROM, cấu trúc mainboard (main đơn hay 2 tầng), chất liệu khung & mặt lưng"
+  },
+  "similarModels": [
+    {
+      "name": "Tên dòng máy có ngoại hình rất giống dễ nhầm linh kiện (VD: Samsung Galaxy A30)",
+      "difference": "Cách phân biệt nhanh bằng mắt thường hoặc mã linh kiện (VD: A30 mặt lưng bóng hơn, vân tay viền kim loại, màn Full HD+)"
+    }
+  ]
+}`;
+        }
+
+        function triggerCorrectionSearch() {
+            const val = document.getElementById('wrongModelCorrectionInput')?.value?.trim();
+            if (!val) {
+                showToast('Vui lòng nhập tên máy hoặc mã model đúng!', 'warning');
+                return;
+            }
+            analyzePhoneByName(val);
+        }
+
+        // Direct Lookup by Phone Name / Hardware Code (No Image Needed or Re-search when Scan is Wrong)
+        async function analyzePhoneByName(overrideModelQuery) {
+            const inputEl = document.getElementById('directModelSearchInput');
+            const query = (overrideModelQuery || inputEl.value || '').trim();
+
+            if (!query) {
+                showToast('Vui lòng nhập tên máy hoặc mã model cần tra cứu!', 'warning');
+                inputEl.focus();
+                return;
+            }
+
+            const activeKeyObj = getActiveApiKeyObj();
+            if (!activeKeyObj) {
+                showToast('Bạn chưa thêm Gemini API Key! Hãy thêm Key để tra cứu máy.', 'warning');
+                switchTab('settings');
+                return;
+            }
+
+            inputEl.value = query;
+            const searchBtn = document.getElementById('directSearchBtn');
+            const loadingCard = document.getElementById('loadingStatusCard');
+            const loadingTitle = document.getElementById('loadingStepTitle');
+            const loadingDesc = document.getElementById('loadingStepDesc');
+
+            searchBtn.disabled = true;
+            loadingCard.classList.remove('hidden');
+            loadingTitle.textContent = `Đang tra cứu dữ liệu chuẩn cho "${query}"...`;
+            loadingDesc.textContent = 'Đang đối chiếu cơ sở dữ liệu thông số kỹ thuật, mã pin, màn hình và quy trình tháo lắp...';
+
+            const directPrompt = `Bạn là một Kỹ thuật viên & Giảng viên dạy sửa chữa phần cứng điện thoại di động bậc thầy tại Việt Nam.
+Học viên đang yêu cầu tra cứu chính xác thông tin kỹ thuật và hướng dẫn tháo lắp cho dòng máy hoặc mã model: "${query}".
+Hãy đối chiếu thông tin từ các nguồn phần cứng chuẩn xác nhất (GSMArena, iFixit, sơ đồ mạch hãng) để cung cấp đúng mã model quốc tế/nội địa, mã pin chuẩn, loại màn hình (AMOLED hay IPS/PLS LCD), hướng mở máy, nhiệt độ bàn nhiệt và vị trí cáp ngầm dễ đứt.
+
+Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không bọc trong markdown code block) theo đúng cấu trúc sau bằng tiếng Việt:
+${getRepairJsonSchemaInstruction()}`;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text: directPrompt }] }],
+                    generationConfig: {
+                        temperature: 0.15,
+                        responseMimeType: 'application/json'
+                    }
+                };
+
+                const { data: result, usedModel } = await callGeminiWithAutoFallback(
+                    activeKeyObj.key,
+                    payload,
+                    (tryingModel) => {
+                        loadingTitle.textContent = `Đang truy xuất dữ liệu "${query}" qua AI (${tryingModel})...`;
+                    }
+                );
+
+                const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                const parsedData = parseGeminiJsonSafely(rawText);
+
+                if (!parsedData || !parsedData.modelName) {
+                    throw new Error('Không thể phân tích dữ liệu máy. Vui lòng ghi rõ tên hãng + tên máy.');
+                }
+
+                currentAnalysisData = parsedData;
+                renderAnalysisResult(parsedData);
+                saveScanToHistory(parsedData, '');
+                showToast(`Đã tải dữ liệu chuẩn: ${parsedData.modelName} (${usedModel})`, 'success');
+            } catch (error) {
+                showToast(`Lỗi tra cứu: ${error.message}`, 'error');
+            } finally {
+                searchBtn.disabled = false;
+                loadingCard.classList.add('hidden');
+            }
+        }
+
         async function analyzePhoneImage() {
             if (!currentCompressedBase64) {
-                showToast('Vui lòng chụp ảnh hoặc chọn ảnh điện thoại trước!', 'warning');
+                // If user typed a model name in the direct search box or notes box without an image, offer direct lookup
+                const typedModel = document.getElementById('directModelSearchInput').value.trim();
+                if (typedModel) {
+                    analyzePhoneByName(typedModel);
+                    return;
+                }
+                showToast('Vui lòng chụp/tải ảnh điện thoại HOẶC nhập tên máy vào ô Tra Cứu Trực Tiếp ở trên!', 'warning');
                 return;
             }
 
@@ -1408,45 +1556,25 @@
             const analyzeBtn = document.getElementById('analyzeBtn');
             const loadingCard = document.getElementById('loadingStatusCard');
             const loadingTitle = document.getElementById('loadingStepTitle');
+            const loadingDesc = document.getElementById('loadingStepDesc');
             const laserOverlay = document.getElementById('scanLaserOverlay');
 
             analyzeBtn.disabled = true;
             loadingCard.classList.remove('hidden');
             laserOverlay.classList.remove('hidden');
+            loadingDesc.textContent = 'Đang thực hiện đối chiếu hình thái học 4 bước: Cụm camera, vị trí đèn Flash, cảm biến vân tay, chữ in mặt lưng...';
 
-            const systemPrompt = `Bạn là một Kỹ thuật viên & Giảng viên dạy sửa chữa phần cứng điện thoại di động bậc thầy tại Việt Nam.
-Hãy phân tích hình ảnh chiếc điện thoại này (có thể là mặt lưng, cụm camera, màn hình, khung sườn hoặc mainboard bên trong) kết hợp với ghi chú của học viên: "${userNotes || 'Không có ghi chú thêm'}".
+            const systemPrompt = `Bạn là một Kỹ thuật viên & Chuyên gia giám định phần cứng điện thoại di động bậc thầy tại Việt Nam.
+Hãy phân tích kỹ lưỡng hình ảnh chiếc điện thoại này kết hợp với ghi chú của học viên: "${userNotes || 'Không có ghi chú thêm'}".
+
+QUY TRÌNH GIÁM ĐỊNH HÌNH THÁI HỌC 4 BƯỚC BẮT BUỘC TRƯỚC KHI KẾT LUẬN TÊN MÁY:
+1. Phân tích cụm Camera & Đèn Flash: Đếm chính xác số mắt camera, hình dáng khung viền camera (bầu dục, chữ nhật, tròn hay tách rời), khoảng cách giữa các ống kính và vị trí chính xác của đèn Flash LED (nằm trong cụm cam, bên dưới hay bên cạnh cụm cam).
+2. Phân tích Mặt lưng, Vân tay & Ký tự in chìm (OCR): Quan sát vị trí/hình dáng cảm biến vân tay mặt lưng (nếu có), vị trí logo hãng (Samsung, Redmi, Xiaomi, OPPO, vivo, Apple...), đọc kỹ mọi dòng chữ nhỏ hoặc mã Model (VD: SM-..., M1908..., CPH...) in ở phần dưới nắp lưng hoặc khay SIM.
+3. Phân tích Chất liệu vỏ & Khung sườn: Nhận diện độ phản xạ ánh sáng của mặt lưng (kính bóng, kính nhám, nhựa giả kính Glasstic, nhựa nhám vân sần hay kim loại nguyên khối) và kiểu dáng khung viền.
+4. Đối chiếu loại trừ các dòng máy ngoại hình giống nhau: Phân biệt cực kỳ cẩn thận các cặp máy dễ nhầm lẫn (VD: Galaxy A20 vs A30 vs M20 vs A10s; Redmi Note 8 vs Note 8 Pro vs Note 8T; Redmi 9A vs 9C; iPhone X vs XS vs 11 Pro...). Nêu rõ bằng chứng thị giác vào trường "confidenceReason".
 
 Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không bọc trong markdown code block) theo đúng cấu trúc sau bằng tiếng Việt:
-{
-  "modelName": "Tên thương mại chính xác nhất của máy (VD: Xiaomi Redmi Note 8 hoặc Samsung Galaxy S22 Ultra 5G)",
-  "confidence": "Cao / Trung bình / Thấp",
-  "confidenceReason": "Giải thích ngắn gọn các đặc điểm nhận dạng trên ảnh (logo Redmi/Samsung, vị trí cảm biến vân tay, cụm camera, khung viền...)",
-  "modelCodes": "Các mã model phần cứng phổ biến của dòng này (VD: M1908C3JG, SM-S908B...)",
-  "repairGuide": {
-    "entryMethod": "Hướng tháo mở máy chuẩn kỹ thuật (VD: Khò nhiệt tách Nắp Lưng sau HOẶC Tách từ Màn Hình trước)",
-    "heatTemp": "Nhiệt độ bàn nhiệt & thời gian khuyến nghị + dung dịch hỗ trợ (VD: 80°C - 90°C trong 2-3 phút, lưu ý màn IPS LCD tránh nhỏ cồn vào phản quang)",
-    "flexCableWarnings": "CẢNH BÁO CỰC KỲ QUAN TRỌNG về vị trí cáp vân tay mặt lưng, cáp màn hình, cáp phím âm lượng/nguồn hoặc cáp nối main-sub dễ bị đứt khi lách mở máy",
-    "disassemblySteps": [
-      "Bước 1: Tháo khay SIM đầu tiên và tắt nguồn hoàn toàn.",
-      "Bước 2: Gia nhiệt nắp lưng/màn hình ở nhiệt độ phù hợp...",
-      "Bước 3: Lưu ý nhấc nhẹ nắp lưng để tháo lồng sắt bảo vệ socket cáp vân tay trước khi nhấc hẳn nắp lưng ra.",
-      "Bước 4: Tháo ốc lồng main, cách ly socket Pin đầu tiên trước khi tháo cáp màn hình và camera."
-    ],
-    "commonIssues": "Các pan bệnh phần cứng hay gặp trên dòng máy này (VD: liệt cảm ứng, mất đèn màn hình, lỗi IC sóng/wifi, phù pin...)"
-  },
-  "specs": {
-    "display": "Loại tấm nền (IPS LCD có phản quang hay AMOLED/OLED), kích thước, độ phân giải, màn phẳng hay cong",
-    "battery": "Dung lượng pin (mAh), mã pin (VD: BN46, EB-BS908ABY), công suất sạc, loại chân sạc (Type-C hay Micro-USB)",
-    "hardware": "Vi xử lý (Chipset), RAM/ROM, cấu trúc mainboard, chất liệu mặt lưng & khung viền"
-  },
-  "similarModels": [
-    {
-      "name": "Tên dòng máy có ngoại hình gần giống dễ nhầm linh kiện",
-      "difference": "Cách phân biệt nhanh bằng mắt thường hoặc kích thước màn/vị trí vân tay/camera"
-    }
-  ]
-}`;
+${getRepairJsonSchemaInstruction()}`;
 
             try {
                 const payload = {
@@ -1462,7 +1590,7 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
                         ]
                     }],
                     generationConfig: {
-                        temperature: 0.2,
+                        temperature: 0.15,
                         responseMimeType: 'application/json'
                     }
                 };
@@ -1471,7 +1599,7 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
                     activeKeyObj.key,
                     payload,
                     (tryingModel) => {
-                        loadingTitle.textContent = `Đang phân tích ảnh qua AI (${tryingModel})...`;
+                        loadingTitle.textContent = `Đang giám định ảnh HD qua AI (${tryingModel})...`;
                     }
                 );
 
@@ -1479,7 +1607,7 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
                 const parsedData = parseGeminiJsonSafely(rawText);
 
                 if (!parsedData || !parsedData.modelName) {
-                    throw new Error('Không thể đọc cấu trúc dữ liệu từ AI. Vui lòng thử chụp rõ nét hơn.');
+                    throw new Error('Không thể đọc cấu trúc dữ liệu từ AI. Vui lòng thử chụp rõ nét hơn hoặc nhập tên máy trực tiếp.');
                 }
 
                 // Render Analysis & Save to Local History
@@ -1541,6 +1669,11 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
                 confBadge.textContent = `Độ chính xác: ${data.confidence}`;
             }
 
+            // 1B. Standard Part Codes & Trusted Verification Sources
+            document.getElementById('resBatteryCode').textContent = data.batteryCode || (data.specs?.battery ? data.specs.battery.split(',')[0] : 'Tra trên lưng pin');
+            document.getElementById('resScreenCompatibility').textContent = data.screenCompatibility || data.specs?.display || 'Kiểm tra mã cáp màn hình trước khi đặt';
+            renderTrustedSourcesInto(data.modelName, data.modelCodes);
+
             // 2. Disassembly & Warnings
             const guide = data.repairGuide || {};
             document.getElementById('resEntryMethod').textContent = guide.entryMethod || 'Kiểm tra kỹ video teardown trước khi khò nhiệt';
@@ -1565,18 +1698,42 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
             document.getElementById('resSpecBattery').textContent = specs.battery || 'Đang cập nhật';
             document.getElementById('resSpecHardware').textContent = specs.hardware || 'Đang cập nhật';
 
-            // 4. Similar Models
+            // 4. Similar Models & Quick Re-search Chips
             const simContainer = document.getElementById('resSimilarModelsList');
+            const quickChipsContainer = document.getElementById('resQuickSwitchSimilarChips');
             const simList = Array.isArray(data.similarModels) ? data.similarModels : [];
+
             if (simList.length === 0) {
                 simContainer.innerHTML = `<p class="text-slate-400">Không có dòng máy nào có thiết kế trùng lặp đáng kể.</p>`;
+                if (quickChipsContainer) quickChipsContainer.innerHTML = '';
             } else {
-                simContainer.innerHTML = simList.map(item => `
-                    <div class="bg-workbench-950 border border-slate-800/90 rounded-xl p-2.5">
-                        <span class="font-bold text-amber-300">${escapeHtml(item.name || '')}:</span>
-                        <span class="text-slate-300 ml-1">${escapeHtml(item.difference || '')}</span>
-                    </div>
-                `).join('');
+                simContainer.innerHTML = simList.map(item => {
+                    const safeNameAttr = escapeHtml(item.name || '').replace(/'/g, "\\'");
+                    return `
+                        <div class="bg-workbench-950 border border-slate-800/90 rounded-xl p-2.5 flex items-start justify-between gap-2">
+                            <div>
+                                <span class="font-bold text-amber-300">${escapeHtml(item.name || '')}:</span>
+                                <span class="text-slate-300 ml-1">${escapeHtml(item.difference || '')}</span>
+                            </div>
+                            <button onclick="analyzePhoneByName('${safeNameAttr}')" class="shrink-0 px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-semibold transition active:scale-95">
+                                Chọn máy này
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+                if (quickChipsContainer) {
+                    quickChipsContainer.innerHTML = `<span class="text-[10px] text-slate-400">Đổi nhanh sang máy giống:</span>` +
+                        simList.map(item => {
+                            const safeNameAttr = escapeHtml(item.name || '').replace(/'/g, "\\'");
+                            return `
+                                <button onclick="analyzePhoneByName('${safeNameAttr}')" 
+                                    class="text-[11px] px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-semibold transition active:scale-95">
+                                    <i class="fa-solid fa-bolt text-[9px] mr-1"></i>${escapeHtml(item.name || '')}
+                                </button>
+                            `;
+                        }).join('');
+                }
             }
 
             // 5. Render Platform Deep Links
@@ -1593,6 +1750,56 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
             setTimeout(() => {
                 container.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 150);
+        }
+
+        // Render 1-Click Trusted Hardware Verification Links (GSMArena, DeviceSpecifications, iFixit, Google Hardware Code)
+        function renderTrustedSourcesInto(modelName, modelCodes) {
+            const container = document.getElementById('resTrustedSourcesGrid');
+            if (!container) return;
+            const cleanName = (modelName || 'Smartphone').trim();
+            const firstCode = (modelCodes || '').split(',')[0].trim();
+            const queryWithCode = firstCode && firstCode !== 'Đang cập nhật' ? `${cleanName} ${firstCode}` : cleanName;
+
+            const sources = [
+                {
+                    name: 'GSMArena',
+                    desc: 'Thông số chuẩn',
+                    icon: 'fa-solid fa-microchip text-emerald-400',
+                    url: `https://www.google.com/search?q=${encodeURIComponent('site:gsmarena.com ' + cleanName)}`
+                },
+                {
+                    name: 'DeviceSpecs',
+                    desc: 'Tra mã phần cứng',
+                    icon: 'fa-solid fa-sliders text-cyan-400',
+                    url: `https://www.google.com/search?q=${encodeURIComponent('site:devicespecifications.com ' + queryWithCode)}`
+                },
+                {
+                    name: 'iFixit',
+                    desc: 'Cẩm nang tháo mở',
+                    icon: 'fa-solid fa-screwdriver-wrench text-amber-400',
+                    url: `https://www.google.com/search?q=${encodeURIComponent('site:ifixit.com ' + cleanName + ' teardown')}`
+                },
+                {
+                    name: 'Google Mã Máy',
+                    desc: 'Đối chiếu hình ảnh',
+                    icon: 'fa-brands fa-google text-rose-400',
+                    url: `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(queryWithCode + ' back cover teardown')}`
+                }
+            ];
+
+            container.innerHTML = sources.map(src => `
+                <a href="${src.url}" target="_blank" rel="noopener noreferrer" 
+                    class="bg-workbench-950 hover:bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-xl p-2.5 flex flex-col justify-between transition active:scale-95">
+                    <div class="flex items-center justify-between">
+                        <i class="${src.icon} text-xs"></i>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-slate-500"></i>
+                    </div>
+                    <div class="mt-1.5">
+                        <span class="block font-bold text-xs text-white truncate">${src.name}</span>
+                        <span class="block text-[10px] text-slate-400 truncate">${src.desc}</span>
+                    </div>
+                </a>
+            `).join('');
         }
 
         // Helper to generate 1-click search buttons for YouTube, TikTok, Bilibili, iFixit, Schematics
@@ -1762,26 +1969,32 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
          * 10. MARKDOWN FORMATTER FOR AI CHAT REPLIES
          ********************************************************************/
         function formatInlineMarkdown(escapedLine) {
-            return escapedLine
+            if (!escapedLine) return '';
+            let out = escapedLine
                 // Inline code `...`
                 .replace(/`([^`]+)`/g, '<code class="font-mono text-[11px] text-cyan-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700/80">$1</code>')
-                // Bold **...**
-                .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-bold">$1</strong>')
+                // Bold **...** (non-greedy across any characters on the line)
+                .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-bold">$1</strong>')
                 // Bold __...__
-                .replace(/__([^_]+)__/g, '<strong class="text-white font-bold">$1</strong>')
-                // Italic *...* (single asterisk not adjacent to space)
-                .replace(/(^|[^*])\*([^*\s][^*]*)\*(?!\*)/g, '$1<em class="text-slate-300 italic">$2</em>');
+                .replace(/__(.+?)__/g, '<strong class="text-white font-bold">$1</strong>')
+                // Italic *...*
+                .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em class="text-slate-300 italic">$2</em>');
+
+            // Clean up any stray unmatched ** markers if AI generated broken markdown
+            out = out.replace(/\*\*/g, '');
+            return out;
         }
 
         function renderMarkdown(rawText) {
             if (!rawText) return '';
-            // Escape HTML first to prevent XSS, then parse Markdown syntax
-            const safeText = escapeHtml(rawText).replace(/\*\*\s*\n\s*/g, '** ');
+            // Escape HTML first to prevent XSS, normalize multiline bold tags
+            const safeText = escapeHtml(rawText)
+                .replace(/\*\*([^\n*]+)\n([^\n*]+)\*\*/g, '**$1 $2**');
             const lines = safeText.split(/\r?\n/);
             const htmlParts = [];
 
             for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
+                let line = lines[i].trim();
 
                 if (!line) {
                     continue;
@@ -1793,56 +2006,96 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
                     continue;
                 }
 
-                // Headings: ####, ###, ##, #
-                const headingMatch = line.match(/^(#{1,4})\s+(.+)$/);
+                // Headings: #####, ####, ###, ##, # (even if there is leading bullet or space)
+                const headingMatch = line.match(/^(?:[*\-•]\s+)?(#{1,6})\s*(.+)$/);
                 if (headingMatch) {
                     const level = headingMatch[1].length;
-                    const content = formatInlineMarkdown(headingMatch[2]);
+                    const content = formatInlineMarkdown(headingMatch[2].replace(/#+$/, '').trim());
                     if (level <= 2) {
-                        htmlParts.push(`<div class="font-extrabold text-emerald-400 text-xs sm:text-sm pt-2 pb-0.5 border-b border-slate-800/70">${content}</div>`);
+                        htmlParts.push(`<div class="font-extrabold text-emerald-400 text-xs sm:text-sm pt-2 pb-1 border-b border-slate-800/80">${content}</div>`);
                     } else {
-                        htmlParts.push(`<div class="font-bold text-amber-300 text-xs pt-1.5">${content}</div>`);
+                        htmlParts.push(`<div class="font-bold text-amber-300 text-xs pt-2 pb-0.5">${content}</div>`);
                     }
                     continue;
                 }
 
-                // Bullet points: * item or - item or • item
-                const bulletMatch = line.match(/^([*\-•])\s+(.+)$/);
+                // Bullet points: * item or - item or • item or + item
+                const bulletMatch = line.match(/^([*\-•+])\s+(.+)$/);
                 if (bulletMatch) {
                     const content = formatInlineMarkdown(bulletMatch[2]);
                     htmlParts.push(`
-                        <div class="flex items-start gap-2 pl-1">
+                        <div class="flex items-start gap-2 pl-1 py-0.5">
                             <span class="text-emerald-400 font-bold select-none mt-0.5">•</span>
-                            <span class="flex-1 text-slate-200">${content}</span>
+                            <span class="flex-1 text-slate-200 leading-relaxed">${content}</span>
                         </div>
                     `);
                     continue;
                 }
 
-                // Numbered list: 1. item, 2. item
+                // Numbered list: 1. item, 2) item
                 const numMatch = line.match(/^(\d+[.)])\s+(.+)$/);
                 if (numMatch) {
                     const badge = numMatch[1];
                     const content = formatInlineMarkdown(numMatch[2]);
                     htmlParts.push(`
-                        <div class="flex items-start gap-1.5 pl-0.5 pt-0.5">
+                        <div class="flex items-start gap-1.5 pl-0.5 py-0.5">
                             <span class="font-mono font-bold text-cyan-400 shrink-0">${badge}</span>
-                            <span class="flex-1 text-slate-200">${content}</span>
+                            <span class="flex-1 text-slate-200 leading-relaxed">${content}</span>
                         </div>
                     `);
                     continue;
                 }
 
                 // Normal paragraph line
-                htmlParts.push(`<p class="text-slate-200">${formatInlineMarkdown(line)}</p>`);
+                htmlParts.push(`<p class="text-slate-200 leading-relaxed">${formatInlineMarkdown(line)}</p>`);
             }
 
             return htmlParts.join('');
         }
 
         /********************************************************************
-         * 11. LOCALSTORAGE SCAN HISTORY MANAGEMENT
+         * 11. LOCALSTORAGE SCAN HISTORY MANAGEMENT & BACKUP/RESTORE JSON
          ********************************************************************/
+        function exportBackupJson() {
+            const backupPayload = {
+                app: 'PhoneFix_AI_PRO',
+                exportedAt: new Date().toISOString(),
+                keys: getSavedApiKeys(),
+                activeKeyId: localStorage.getItem(STORAGE_KEYS.ACTIVE_KEY_ID) || '',
+                selectedModel: getSelectedModelSetting(),
+                history: getScanHistory()
+            };
+            const fileName = `phonefix_backup_${new Date().toISOString().slice(0, 10)}.json`;
+            downloadFileHelper(fileName, JSON.stringify(backupPayload, null, 2), 'application/json');
+        }
+
+        function importBackupJson(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed.keys)) {
+                        saveApiKeysList(parsed.keys);
+                    }
+                    if (parsed.activeKeyId) {
+                        localStorage.setItem(STORAGE_KEYS.ACTIVE_KEY_ID, parsed.activeKeyId);
+                    }
+                    if (Array.isArray(parsed.history)) {
+                        localStorage.setItem(STORAGE_KEYS.SCAN_HISTORY, JSON.stringify(parsed.history));
+                    }
+                    loadSavedSettingsUI();
+                    renderHistoryList();
+                    showToast('Đã khôi phục dữ liệu Key & Lịch sử thành công!', 'success');
+                } catch (err) {
+                    showToast('File Backup không hợp lệ!', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
         function getScanHistory() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEYS.SCAN_HISTORY);
