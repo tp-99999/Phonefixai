@@ -1,1535 +1,2066 @@
 <!DOCTYPE html>
 <html lang="vi" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0b1120" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="PhoneFix AI" />
-  <title>PhoneFix AI PRO</title>
-
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Font Awesome 6 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
-
-  <style>
-    * {
-      -webkit-tap-highlight-color: transparent;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #070b14;
-      background-image: 
-        radial-gradient(rgba(16, 185, 129, 0.06) 1px, transparent 1px),
-        linear-gradient(to bottom, #070b14, #0b1120);
-      background-size: 24px 24px, 100% 100%;
-      color: #f1f5f9;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
-    .font-mono-code {
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    /* Thanh điều hướng dưới cùng: Chuyển sang màu trắng khi chọn */
-    .bottom-nav-btn {
-      color: #64748b;
-      position: relative;
-      transition: all 0.2s ease;
-    }
-    .bottom-nav-btn.active {
-      color: #ffffff !important;
-    }
-    .bottom-nav-btn.active::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 25%;
-      width: 50%;
-      height: 3px;
-      background: #ffffff;
-      border-radius: 0 0 4px 4px;
-      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.6);
-    }
-
-    /* Định dạng văn bản trả lời của Chat AI */
-    .ai-markdown h1, .ai-markdown h2, .ai-markdown h3, .ai-markdown h4 {
-      color: #34d399;
-      font-weight: 700;
-      font-size: 0.95rem;
-      margin-top: 0.75rem;
-      margin-bottom: 0.35rem;
-      line-height: 1.4;
-    }
-    .ai-markdown h1:first-child, .ai-markdown h2:first-child, .ai-markdown h3:first-child {
-      margin-top: 0.15rem;
-    }
-    .ai-markdown strong {
-      color: #ffffff;
-      font-weight: 700;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 0 4px;
-      border-radius: 4px;
-    }
-    .ai-markdown ul {
-      list-style-type: disc;
-      padding-left: 1.25rem;
-      margin: 0.4rem 0;
-    }
-    .ai-markdown ol {
-      list-style-type: decimal;
-      padding-left: 1.25rem;
-      margin: 0.4rem 0;
-    }
-    .ai-markdown li {
-      margin-bottom: 0.3rem;
-      line-height: 1.5;
-    }
-    .ai-markdown p {
-      margin-bottom: 0.45rem;
-      line-height: 1.55;
-    }
-    .ai-markdown code {
-      font-family: 'JetBrains Mono', monospace;
-      color: #fbbf24;
-      background: rgba(251, 191, 36, 0.12);
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-size: 0.82rem;
-    }
-
-    @keyframes pulseBorder {
-      0%, 100% { border-color: rgba(16, 185, 129, 0.4); }
-      50% { border-color: rgba(16, 185, 129, 0.9); }
-    }
-    .scanning-box {
-      animation: pulseBorder 1.5s infinite;
-    }
-  </style>
-</head>
-<body class="min-h-screen pb-24 select-none">
-
-  <!-- HEADER CỐ ĐỊNH (Đã xoá dòng chữ nhỏ dưới tên app) -->
-  <header class="sticky top-0 z-40 bg-[#0b1120]/95 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
-    <div class="max-w-lg mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-slate-950 shadow-lg shadow-emerald-500/20">
-          <i class="fa-solid fa-screwdriver-wrench text-lg"></i>
-        </div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-lg font-extrabold tracking-tight text-white">
-            PhoneFix <span class="text-emerald-400">AI</span>
-          </h1>
-          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 border border-emerald-500/30">PRO</span>
-        </div>
-      </div>
-
-      <button onclick="switchTab('settings')" id="headerKeyBtn" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-emerald-500/30 text-xs font-semibold text-emerald-400 active:scale-95 transition">
-        <span id="headerKeyDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
-        <span id="headerKeyText">Chưa có Key</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- KHUNG NỘI DUNG CHÍNH -->
-  <main class="max-w-lg mx-auto px-3.5 pt-3.5 space-y-4">
-
-    <!-- HỘP THÔNG BÁO LỖI NẾU CÓ -->
-    <div id="errorAlert" class="hidden bg-rose-950/90 border border-rose-500/50 rounded-2xl p-3.5 text-rose-100 text-xs shadow-xl">
-      <div class="flex items-start gap-2.5">
-        <i class="fa-solid fa-circle-xmark text-rose-400 text-base mt-0.5"></i>
-        <div class="flex-1 leading-relaxed" id="errorAlertText"></div>
-        <button onclick="hideError()" class="text-rose-300 hover:text-white px-1">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- ==================== TAB 1: NHẬN DIỆN ==================== -->
-    <section id="tab-scan" class="space-y-4">
-
-      <!-- Ô NHẬP TÊN MÁY / MÃ MODEL TRỰC TIẾP (DỰ PHÒNG HOẶC TRA NHANH) -->
-      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-3.5 shadow-lg">
-        <div class="flex items-center justify-between mb-2">
-          <label class="text-xs font-bold text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-magnifying-glass-chart text-emerald-400"></i>
-            Tra Cứu Bằng Tên Máy / Mã Model
-          </label>
-          <span class="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-medium">
-            Chuẩn 100%
-          </span>
-        </div>
-        <div class="flex gap-2">
-          <input
-            type="text"
-            id="manualPhoneInput"
-            placeholder="VD: Redmi Note 8, SM-A205F, iPhone 11..."
-            class="flex-1 bg-slate-950 border border-slate-700/80 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 outline-none"
-            onkeydown="if(event.key==='Enter') analyzeByManualName()"
-          />
-          <button
-            onclick="analyzeByManualName()"
-            id="btnManualSearch"
-            class="bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-xs px-4 rounded-xl flex items-center gap-1.5 transition shrink-0"
-          >
-            <i class="fa-solid fa-bolt"></i>
-            <span>Tra Máy</span>
-          </button>
-        </div>
-        <p class="text-[11px] text-slate-400 mt-2 leading-snug">
-          Nhập trực tiếp tên máy hoặc mã vỏ khi không có ảnh, hoặc dùng khi ảnh chụp mờ làm AI nhận diện nhầm.
-        </p>
-      </div>
-
-      <!-- KHUNG CHỤP ẢNH / TẢI ẢNH GIÁM ĐỊNH -->
-      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3.5">
-        <div class="flex items-center gap-2">
-          <span class="w-1.5 h-5 rounded-full bg-emerald-400"></span>
-          <h2 class="text-sm font-bold text-white">Chụp Hoặc Tải Ảnh Điện Thoại</h2>
-        </div>
-
-        <!-- 2 nút chọn ảnh khi chưa có ảnh -->
-        <div id="uploadButtonsGrid" class="grid grid-cols-2 gap-3">
-          <label class="cursor-pointer rounded-2xl border-2 border-dashed border-emerald-500/40 bg-emerald-950/20 hover:bg-emerald-950/30 p-4 flex flex-col items-center text-center transition active:scale-95">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center text-xl mb-2.5 shadow-md shadow-emerald-500/20">
-              <i class="fa-solid fa-camera"></i>
-            </div>
-            <span class="text-xs font-bold text-emerald-400">Chụp Trực Tiếp</span>
-            <span class="text-[11px] text-slate-400 mt-1">Mặt lưng / Cụm cam / Nội thất</span>
-            <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleImageFile(event)" />
-          </label>
-
-          <label class="cursor-pointer rounded-2xl border border-slate-700/80 bg-slate-900/60 hover:bg-slate-900 p-4 flex flex-col items-center text-center transition active:scale-95">
-            <div class="w-12 h-12 rounded-2xl bg-slate-800 text-sky-400 flex items-center justify-center text-xl mb-2.5 border border-slate-700">
-              <i class="fa-solid fa-images"></i>
-            </div>
-            <span class="text-xs font-bold text-slate-200">Tải Ảnh Từ Máy</span>
-            <span class="text-[11px] text-slate-400 mt-1">Chọn ảnh có sẵn trong thư viện</span>
-            <input type="file" id="galleryInput" accept="image/*" class="hidden" onchange="handleImageFile(event)" />
-          </label>
-        </div>
-
-        <!-- Khung xem trước ảnh sau khi chọn -->
-        <div id="imagePreviewBox" class="hidden relative rounded-2xl overflow-hidden border border-slate-700 bg-slate-950">
-          <img id="previewImg" src="" alt="Preview" class="w-full max-h-72 object-contain mx-auto" />
-          <div class="absolute top-2.5 right-2.5 flex gap-2">
-            <button onclick="clearSelectedImage()" class="bg-slate-900/90 hover:bg-rose-600 text-white text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-1.5 shadow-lg">
-              <i class="fa-solid fa-trash-can"></i> Xoá ảnh
-            </button>
-          </div>
-          <div id="compressBadge" class="absolute bottom-2.5 left-2.5 bg-slate-950/85 border border-emerald-500/30 text-emerald-400 text-[11px] font-mono-code px-2.5 py-1 rounded-lg">
-            Forensic HD 1600px
-          </div>
-        </div>
-
-        <!-- Ghi chú thêm cho AI -->
-        <div>
-          <label class="text-xs text-slate-300 font-medium flex items-center gap-1.5 mb-1.5">
-            <i class="fa-solid fa-comment-dots text-emerald-400"></i>
-            Ghi chú đặc điểm thêm cho AI (Tùy chọn):
-          </label>
-          <input
-            type="text"
-            id="imageHintInput"
-            placeholder="VD: Vỏ nhựa bóng, chân sạc Micro-USB, mã in mờ M1908C3JG..."
-            class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none"
-          />
-        </div>
-
-        <!-- Nút bấm phân tích -->
-        <button
-          onclick="analyzeImageWithAI()"
-          id="btnAnalyzeImage"
-          class="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.99] text-slate-950 font-extrabold text-xs tracking-wide uppercase flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition"
-        >
-          <i class="fa-solid fa-microchip text-sm"></i>
-          <span>Phân Tích Tên Máy & Hướng Dẫn Tháo Lắp</span>
-        </button>
-
-        <p class="text-[11px] text-slate-400 text-center leading-relaxed">
-          💡 Mẹo: Chụp rõ <strong class="text-slate-200">cụm camera + đèn Flash</strong>, vị trí cảm biến vân tay hoặc dòng chữ nhỏ ở <strong class="text-slate-200">mặt lưng / khay SIM</strong> để độ chính xác đạt tối đa.
-        </p>
-      </div>
-
-      <!-- TRẠNG THÁI ĐANG PHÂN TÍCH -->
-      <div id="loadingBox" class="hidden bg-[#111827] border border-emerald-500/40 scanning-box rounded-2xl p-5 text-center space-y-3">
-        <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl mx-auto">
-          <i class="fa-solid fa-spinner fa-spin"></i>
-        </div>
-        <div class="text-xs font-bold text-white" id="loadingTitle">Đang giám định hình thái học & tra cứu dữ liệu phần cứng...</div>
-        <div class="text-[11px] text-slate-400" id="loadingSub">Đang đối chiếu cụm camera, đèn flash, mã vỏ và sơ đồ cáp...</div>
-      </div>
-
-      <!-- KẾT QUẢ PHÂN TÍCH CHI TIẾT -->
-      <div id="resultContainer" class="hidden space-y-4"></div>
-
-    </section>
-
-    <!-- ==================== TAB 2: LỊCH SỬ ==================== -->
-    <section id="tab-history" class="hidden space-y-3.5">
-      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
-        <div>
-          <h2 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i>
-            Lịch Sử Máy Đã Tra Cứu
-          </h2>
-          <p class="text-[11px] text-slate-400 mt-0.5">Lưu trên thiết bị để xem lại nhanh khi đang tháo máy</p>
-        </div>
-        <button onclick="clearAllHistory()" class="text-xs text-rose-400 hover:text-rose-300 font-semibold px-2.5 py-1.5 rounded-lg bg-rose-950/40 border border-rose-500/30">
-          Xoá hết
-        </button>
-      </div>
-      <div id="historyList" class="space-y-2.5"></div>
-    </section>
-
-    <!-- ==================== TAB 3: CÔNG CỤ THỢ ==================== -->
-    <section id="tab-tools" class="hidden space-y-4">
-      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 space-y-3">
-        <h2 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-temperature-three-quarters text-amber-400"></i>
-          Bảng Nhiệt Độ Bàn Nhiệt & Khò Chuẩn Thực Chiến
-        </h2>
-        <div class="space-y-2 text-xs">
-          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex justify-between items-center">
-            <div>
-              <div class="font-bold text-white">Tách nắp lưng Nhựa / Glasstic (Samsung A, Redmi)</div>
-              <div class="text-[11px] text-slate-400">Dùng cồn 90° hoặc nước tách keo, tránh khò 1 chỗ</div>
-            </div>
-            <span class="font-mono-code font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">70°C - 80°C</span>
-          </div>
-          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex justify-between items-center">
-            <div>
-              <div class="font-bold text-white">Tách nắp lưng Kính (Xiaomi, OPPO, Samsung S/Note)</div>
-              <div class="text-[11px] text-slate-400">Ủ bàn nhiệt 3-4 phút + lá nhựa mỏng 0.1mm</div>
-            </div>
-            <span class="font-mono-code font-bold text-amber-400 bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-500/30">85°C - 95°C</span>
-          </div>
-          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex justify-between items-center">
-            <div>
-              <div class="font-bold text-white">Tách màn hình AMOLED / OLED nguyên khung</div>
-              <div class="text-[11px] text-slate-400">Tuyệt đối không nhỏ cồn vào màn LCD có phản quang</div>
-            </div>
-            <span class="font-mono-code font-bold text-sky-400 bg-sky-950/60 px-2.5 py-1 rounded-lg border border-sky-500/30">80°C - 90°C</span>
-          </div>
-          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex justify-between items-center">
-            <div>
-              <div class="font-bold text-white">Tháo chân sạc / Mic / Socket nhựa trên Main</div>
-              <div class="text-[11px] text-slate-400">Che chắn kỹ lồng sắt và mic số xung quanh</div>
-            </div>
-            <span class="font-mono-code font-bold text-rose-400 bg-rose-950/60 px-2.5 py-1 rounded-lg border border-rose-500/30">280°C - 320°C</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Kho sơ đồ mạch miễn phí -->
-      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 space-y-3">
-        <h2 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-diagram-project text-emerald-400"></i>
-          Nguồn Tra Cứu Thông Số & Sơ Đồ Mạch Uy Tín
-        </h2>
-        <div class="grid grid-cols-2 gap-2.5 text-xs">
-          <a href="https://www.gsmarena.com/" target="_blank" class="p-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-emerald-500/40 flex items-center gap-2.5">
-            <i class="fa-solid fa-globe text-emerald-400 text-base"></i>
-            <div>
-              <div class="font-bold text-white">GSMArena</div>
-              <div class="text-[10px] text-slate-400">Chuẩn mã Model & Pin</div>
-            </div>
-          </a>
-          <a href="https://www.devicespecifications.com/" target="_blank" class="p-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-sky-500/40 flex items-center gap-2.5">
-            <i class="fa-solid fa-microchip text-sky-400 text-base"></i>
-            <div>
-              <div class="font-bold text-white">DeviceSpecs</div>
-              <div class="text-[10px] text-slate-400">Soi chi tiết IC & Cam</div>
-            </div>
-          </a>
-          <a href="https://vi.ifixit.com/Device/Phone" target="_blank" class="p-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500/40 flex items-center gap-2.5">
-            <i class="fa-solid fa-screwdriver text-amber-400 text-base"></i>
-            <div>
-              <div class="font-bold text-white">iFixit Guides</div>
-              <div class="text-[10px] text-slate-400">Ảnh tháo máy từng ốc</div>
-            </div>
-          </a>
-          <a href="https://phonedb.net/" target="_blank" class="p-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-purple-500/40 flex items-center gap-2.5">
-            <i class="fa-solid fa-database text-purple-400 text-base"></i>
-            <div>
-              <div class="font-bold text-white">PhoneDB</div>
-              <div class="text-[10px] text-slate-400">Tra mã PDA / Board</div>
-            </div>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== TAB 4: KEY & CÀI APP ==================== -->
-    <section id="tab-settings" class="hidden space-y-4">
-      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 space-y-3.5">
-        <div class="flex items-center justify-between">
-          <h2 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-key text-emerald-400"></i>
-            Quản Lý Gemini API Key (Lưu Trên Máy)
-          </h2>
-          <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg">
-            + Lấy Key Miễn Phí
-          </a>
-        </div>
-
-        <div class="space-y-2">
-          <input
-            type="text"
-            id="keyLabelInput"
-            placeholder="Tên gợi nhớ (VD: Key Gmail Chính)"
-            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
-          />
-          <div class="flex gap-2">
-            <input
-              type="password"
-              id="keyValueInput"
-              placeholder="Dán mã AIzaSy... vào đây"
-              class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white font-mono-code placeholder-slate-500 outline-none"
-            />
-            <button onclick="addNewApiKey()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 rounded-xl shrink-0">
-              Lưu Key
-            </button>
-          </div>
-        </div>
-
-        <div id="apiKeyList" class="space-y-2 pt-1"></div>
-      </div>
-
-      <!-- CẤU HÌNH MODEL GEMINI TỰ ĐỘNG FALLBACK -->
-      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 space-y-3">
-        <div class="flex items-center justify-between">
-          <h2 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-robot text-sky-400"></i>
-            Chế Độ Model AI
-          </h2>
-          <button onclick="detectModelsFromKey()" id="btnDetectModels" class="text-[11px] font-semibold text-sky-400 bg-sky-500/10 border border-sky-500/30 px-2.5 py-1 rounded-lg">
-            <i class="fa-solid fa-rotate mr-1"></i>Dò Model từ Key
-          </button>
-        </div>
-
-        <select id="modelSelect" onchange="savePreferredModel(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white outline-none">
-          <option value="auto">Tự động dò Model mới nhất (Khuyên dùng)</option>
-          <option value="gemini-3.8-flash">gemini-3.8-flash</option>
-          <option value="gemini-2.5-flash">gemini-2.5-flash</option>
-          <option value="gemini-2.0-flash">gemini-2.0-flash</option>
-        </select>
-        <p class="text-[11px] text-slate-400 leading-relaxed">
-          Khi để chế độ <strong>Tự động</strong>, nếu Google đổi tên model mới, ứng dụng sẽ tự động đọc thông báo từ Google và chuyển sang model hoạt động ngay lập tức.
-        </p>
-      </div>
-
-      <!-- SAO LƯU & KHÔI PHỤC DỮ LIỆU -->
-      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 space-y-3">
-        <h2 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-shield-halved text-emerald-400"></i>
-          Sao Lưu Key & Lịch Sử Tra Cứu
-        </h2>
-        <div class="grid grid-cols-2 gap-2.5">
-          <button onclick="exportBackupJson()" class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-200 flex items-center justify-center gap-2">
-            <i class="fa-solid fa-download text-emerald-400"></i> Xuất Backup
-          </button>
-          <label class="cursor-pointer p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-200 flex items-center justify-center gap-2">
-            <i class="fa-solid fa-upload text-sky-400"></i> Nhập Backup
-            <input type="file" accept=".json" class="hidden" onchange="importBackupJson(event)" />
-          </label>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- THANH ĐIỀU HƯỚNG DƯỚI CÙNG (4 MỤC CÓ ĐẦY ĐỦ ICON & CHUYỂN MÀU TRẮNG KHI NHẤN) -->
-  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#0b1120]/95 backdrop-blur-md border-t border-slate-800/90">
-    <div class="max-w-lg mx-auto grid grid-cols-4 h-16">
-      <button onclick="switchTab('scan')" id="nav-scan" class="bottom-nav-btn active flex flex-col items-center justify-center gap-1">
-        <i class="fa-solid fa-camera text-base"></i>
-        <span class="text-[11px] font-semibold">Nhận Diện</span>
-      </button>
-
-      <button onclick="switchTab('history')" id="nav-history" class="bottom-nav-btn flex flex-col items-center justify-center gap-1 relative">
-        <div class="relative">
-          <i class="fa-solid fa-clock-rotate-left text-base"></i>
-          <span id="historyCountBadge" class="hidden absolute -top-1.5 -right-3 bg-emerald-500 text-slate-950 text-[9px] font-extrabold px-1.5 rounded-full">0</span>
-        </div>
-        <span class="text-[11px] font-semibold">Lịch Sử</span>
-      </button>
-
-      <button onclick="switchTab('tools')" id="nav-tools" class="bottom-nav-btn flex flex-col items-center justify-center gap-1">
-        <i class="fa-solid fa-briefcase text-base"></i>
-        <span class="text-[11px] font-semibold">Công Cụ Thợ</span>
-      </button>
-
-      <button onclick="switchTab('settings')" id="nav-settings" class="bottom-nav-btn flex flex-col items-center justify-center gap-1">
-        <i class="fa-solid fa-key text-base"></i>
-        <span class="text-[11px] font-semibold">Key & Cài App</span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- JAVASCRIPT XỬ LÝ CHÍNH -->
-  <script>
-    // Xoá các Service Worker cũ gây kẹt màn hình đen trên trình duyệt di động
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        for (let registration of registrations) {
-          registration.unregister();
-        }
-      }).catch(function() {});
-    }
-
-    // KHO LƯU TRỮ LOCALSTORAGE
-    const STORAGE_KEYS = {
-      API_KEYS: 'pf_api_keys_v3',
-      ACTIVE_KEY_ID: 'pf_active_key_id_v3',
-      HISTORY: 'pf_repair_history_v3',
-      PREFERRED_MODEL: 'pf_preferred_model_v3',
-      WORKING_MODEL: 'pf_last_working_model_v3'
-    };
-
-    let state = {
-      apiKeys: [],
-      activeKeyId: null,
-      history: [],
-      preferredModel: 'auto',
-      currentImageBase64: null,
-      currentImageMime: 'image/jpeg',
-      currentDeviceData: null,
-      chatMessages: []
-    };
-
-    // KHỞI ĐỘNG ỨNG DỤNG
-    window.addEventListener('DOMContentLoaded', function() {
-      loadStateFromStorage();
-      renderHeaderKeyStatus();
-      renderApiKeyList();
-      renderHistoryList();
-    });
-
-    function loadStateFromStorage() {
-      try {
-        const savedKeys = localStorage.getItem(STORAGE_KEYS.API_KEYS);
-        if (savedKeys) state.apiKeys = JSON.parse(savedKeys);
-
-        const savedActive = localStorage.getItem(STORAGE_KEYS.ACTIVE_KEY_ID);
-        if (savedActive) state.activeKeyId = savedActive;
-        if (!state.activeKeyId && state.apiKeys.length > 0) {
-          state.activeKeyId = state.apiKeys[0].id;
-        }
-
-        const savedHistory = localStorage.getItem(STORAGE_KEYS.HISTORY);
-        if (savedHistory) state.history = JSON.parse(savedHistory);
-
-        const savedModel = localStorage.getItem(STORAGE_KEYS.PREFERRED_MODEL);
-        if (savedModel) {
-          state.preferredModel = savedModel;
-          const selectEl = document.getElementById('modelSelect');
-          if (selectEl) selectEl.value = savedModel;
-        }
-      } catch (e) {
-        console.error('Lỗi đọc localStorage:', e);
-      }
-    }
-
-    function saveStateToStorage() {
-      try {
-        localStorage.setItem(STORAGE_KEYS.API_KEYS, JSON.stringify(state.apiKeys));
-        localStorage.setItem(STORAGE_KEYS.ACTIVE_KEY_ID, state.activeKeyId || '');
-        localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(state.history));
-        localStorage.setItem(STORAGE_KEYS.PREFERRED_MODEL, state.preferredModel);
-      } catch (e) {
-        console.error('Lỗi lưu localStorage:', e);
-      }
-    }
-
-    // CHUYỂN TAB VÀ ĐỒNG BỘ MÀU TRẮNG
-    function switchTab(tabName) {
-      const tabs = ['scan', 'history', 'tools', 'settings'];
-      tabs.forEach(function(t) {
-        const sec = document.getElementById('tab-' + t);
-        const navBtn = document.getElementById('nav-' + t);
-        if (t === tabName) {
-          if (sec) sec.classList.remove('hidden');
-          if (navBtn) navBtn.classList.add('active');
-        } else {
-          if (sec) sec.classList.add('hidden');
-          if (navBtn) navBtn.classList.remove('active');
-        }
-      });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // HIỂN THỊ / ẨN LỖI
-    function showError(msg) {
-      const box = document.getElementById('errorAlert');
-      const txt = document.getElementById('errorAlertText');
-      if (box && txt) {
-        txt.innerHTML = escapeHtml(msg);
-        box.classList.remove('hidden');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    }
-
-    function hideError() {
-      const box = document.getElementById('errorAlert');
-      if (box) box.classList.add('hidden');
-    }
-
-    function escapeHtml(str) {
-      return String(str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
-    // BỘ XỬ LÝ MARKDOWN CHO KHUNG CHAT AI (SỬA TRIỆT ĐỂ LỖI ### VÀ **)
-    function renderMarkdown(rawText) {
-      if (!rawText) return '';
-      let lines = String(rawText).replace(/\r\n/g, '\n').split('\n');
-      let html = '';
-      let inUl = false;
-      let inOl = false;
-
-      function closeLists() {
-        if (inUl) { html += '</ul>'; inUl = false; }
-        if (inOl) { html += '</ol>'; inOl = false; }
-      }
-
-      function formatInline(text) {
-        let s = escapeHtml(text);
-        // Chữ in đậm **text** hoặc __text__
-        s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-        s = s.replace(/__([^_]+)__/g, '<strong>$1</strong>');
-        // Code ngắn `code`
-        s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
-        // In nghiêng *text*
-        s = s.replace(/(^|\s)\*([^*\n]+)\*(?=\s|$)/g, '$1<em>$2</em>');
-        return s;
-      }
-
-      for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim();
-
-        if (!line) {
-          closeLists();
-          continue;
-        }
-
-        // Tiêu đề #, ##, ###, ####
-        let headingMatch = line.match(/^(#{1,4})\s+(.*)$/);
-        if (headingMatch) {
-          closeLists();
-          let cleanTitle = headingMatch[2].replace(/\*\*/g, '');
-          html += '<h3>' + formatInline(cleanTitle) + '</h3>';
-          continue;
-        }
-
-        // Gạch đầu dòng * hoặc - hoặc •
-        let ulMatch = line.match(/^([*\-•])\s+(.*)$/);
-        if (ulMatch) {
-          if (inOl) { html += '</ol>'; inOl = false; }
-          if (!inUl) { html += '<ul>'; inUl = true; }
-          html += '<li>' + formatInline(ulMatch[2]) + '</li>';
-          continue;
-        }
-
-        // Đánh số 1. 2.
-        let olMatch = line.match(/^(\d+)\.\s+(.*)$/);
-        if (olMatch) {
-          if (inUl) { html += '</ul>'; inUl = false; }
-          if (!inOl) { html += '<ol>'; inOl = true; }
-          html += '<li>' + formatInline(olMatch[2]) + '</li>';
-          continue;
-        }
-
-        closeLists();
-        html += '<p>' + formatInline(line) + '</p>';
-      }
-
-      closeLists();
-      return html;
-    }
-
-    // QUẢN LÝ API KEY
-    function getActiveKeyObj() {
-      if (!state.apiKeys.length) return null;
-      return state.apiKeys.find(function(k) { return k.id === state.activeKeyId; }) || state.apiKeys[0];
-    }
-
-    function renderHeaderKeyStatus() {
-      const btn = document.getElementById('headerKeyBtn');
-      const dot = document.getElementById('headerKeyDot');
-      const txt = document.getElementById('headerKeyText');
-      const active = getActiveKeyObj();
-
-      if (active) {
-        txt.textContent = active.label;
-        dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
-        btn.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-emerald-500/40 text-xs font-semibold text-emerald-400 active:scale-95 transition';
-      } else {
-        txt.textContent = 'Thêm Key API';
-        dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
-        btn.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-950/40 border border-amber-500/40 text-xs font-semibold text-amber-300 active:scale-95 transition';
-      }
-    }
-
-    function addNewApiKey() {
-      const labelEl = document.getElementById('keyLabelInput');
-      const valEl = document.getElementById('keyValueInput');
-      const rawKey = (valEl.value || '').trim();
-      const label = (labelEl.value || '').trim() || ('Key ' + (state.apiKeys.length + 1));
-
-      if (!rawKey || rawKey.length < 20) {
-        showError('Vui lòng dán mã Gemini API Key hợp lệ (bắt đầu bằng AIza...).');
-        return;
-      }
-
-      const newId = 'key_' + Date.now();
-      state.apiKeys.push({
-        id: newId,
-        label: label,
-        key: rawKey
-      });
-      state.activeKeyId = newId;
-      saveStateToStorage();
-
-      labelEl.value = '';
-      valEl.value = '';
-      hideError();
-      renderHeaderKeyStatus();
-      renderApiKeyList();
-    }
-
-    function selectApiKey(id) {
-      state.activeKeyId = id;
-      saveStateToStorage();
-      renderHeaderKeyStatus();
-      renderApiKeyList();
-    }
-
-    function deleteApiKey(id) {
-      state.apiKeys = state.apiKeys.filter(function(k) { return k.id !== id; });
-      if (state.activeKeyId === id) {
-        state.activeKeyId = state.apiKeys.length ? state.apiKeys[0].id : null;
-      }
-      saveStateToStorage();
-      renderHeaderKeyStatus();
-      renderApiKeyList();
-    }
-
-    function renderApiKeyList() {
-      const container = document.getElementById('apiKeyList');
-      if (!container) return;
-
-      if (!state.apiKeys.length) {
-        container.innerHTML = '<div class="text-xs text-slate-400 bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-center">Chưa có API Key nào được lưu trên thiết bị.</div>';
-        return;
-      }
-
-      container.innerHTML = state.apiKeys.map(function(item) {
-        const isActive = item.id === state.activeKeyId;
-        const masked = item.key.slice(0, 8) + '••••••••' + item.key.slice(-4);
-        return `
-          <div class="p-3 rounded-xl border ${isActive ? 'bg-emerald-950/20 border-emerald-500/50' : 'bg-slate-950 border-slate-800'} flex items-center justify-between gap-2">
-            <div onclick="selectApiKey('${item.id}')" class="flex-1 cursor-pointer">
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full ${isActive ? 'bg-emerald-400' : 'bg-slate-600'}"></span>
-                <span class="text-xs font-bold text-white">${escapeHtml(item.label)}</span>
-                ${isActive ? '<span class="text-[10px] text-emerald-400 font-semibold">(Đang dùng)</span>' : ''}
-              </div>
-              <div class="text-[11px] font-mono-code text-slate-400 mt-0.5">${escapeHtml(masked)}</div>
-            </div>
-            <button onclick="deleteApiKey('${item.id}')" class="text-rose-400 hover:text-rose-300 p-2">
-              <i class="fa-solid fa-trash-can text-xs"></i>
-            </button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function savePreferredModel(val) {
-      state.preferredModel = val;
-      saveStateToStorage();
-    }
-
-    // DÒ DANH SÁCH MODEL TỪ KEY
-    async function detectModelsFromKey() {
-      const activeKey = getActiveKeyObj();
-      if (!activeKey) {
-        showError('Vui lòng thêm API Key trước khi dò danh sách Model.');
-        return;
-      }
-      const btn = document.getElementById('btnDetectModels');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Đang dò...';
-      try {
-        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models?key=' + encodeURIComponent(activeKey.key));
-        const data = await res.json();
-        if (data.models && Array.isArray(data.models)) {
-          const selectEl = document.getElementById('modelSelect');
-          const flashModels = data.models
-            .filter(function(m) {
-              return m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent') && m.name.includes('gemini');
-            })
-            .map(function(m) { return m.name.replace('models/', ''); });
-
-          if (flashModels.length > 0) {
-            selectEl.innerHTML = '<option value="auto">Tự động dò Model mới nhất (Khuyên dùng)</option>' +
-              flashModels.map(function(m) {
-                return `<option value="${m}">${m}</option>`;
-              }).join('');
-            localStorage.setItem(STORAGE_KEYS.WORKING_MODEL, flashModels[0]);
-          }
-        }
-      } catch (e) {
-        showError('Không thể kết nối lấy danh sách model: ' + e.message);
-      } finally {
-        btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Đã cập nhật';
-        setTimeout(function() {
-          btn.innerHTML = '<i class="fa-solid fa-rotate mr-1"></i>Dò Model từ Key';
-        }, 2000);
-      }
-    }
-
-    // XỬ LÝ NÉN ẢNH ĐỘ PHÂN GIẢI CAO (FORENSIC HD 1600PX)
-    function handleImageFile(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-      hideError();
-
-      const originalKB = Math.round(file.size / 1024);
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const maxDim = 1600; // Giữ độ nét cao để soi rõ chữ in mờ và cụm cam
-          let w = img.width;
-          let h = img.height;
-          if (w > maxDim || h > maxDim) {
-            if (w > h) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            } else {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
-            }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-          state.currentImageBase64 = dataUrl.split(',')[1];
-          state.currentImageMime = 'image/jpeg';
-
-          const compressedKB = Math.round((state.currentImageBase64.length * 3) / 4 / 1024);
-          document.getElementById('previewImg').src = dataUrl;
-          document.getElementById('compressBadge').textContent = `HD 1600px: ${originalKB}KB → ${compressedKB}KB`;
-          document.getElementById('uploadButtonsGrid').classList.add('hidden');
-          document.getElementById('imagePreviewBox').classList.remove('hidden');
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function clearSelectedImage() {
-      state.currentImageBase64 = null;
-      document.getElementById('cameraInput').value = '';
-      document.getElementById('galleryInput').value = '';
-      document.getElementById('imagePreviewBox').classList.add('hidden');
-      document.getElementById('uploadButtonsGrid').classList.remove('hidden');
-    }
-
-    // HÀM GỌI GEMINI API VỚI CƠ CHẾ SMART AUTO-FALLBACK
-    async function callGeminiSmart(contents, expectJson) {
-      const activeKey = getActiveKeyObj();
-      if (!activeKey) {
-        switchTab('settings');
-        throw new Error('Bạn chưa thêm Gemini API Key. Hãy dán API Key ở mục "Key & Cài App" để sử dụng.');
-      }
-
-      // Danh sách model ưu tiên thử nghiệm
-      const lastWorking = localStorage.getItem(STORAGE_KEYS.WORKING_MODEL);
-      let candidateModels = [];
-      if (state.preferredModel && state.preferredModel !== 'auto') {
-        candidateModels.push(state.preferredModel);
-      }
-      if (lastWorking && !candidateModels.includes(lastWorking)) {
-        candidateModels.push(lastWorking);
-      }
-      ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'].forEach(function(m) {
-        if (!candidateModels.includes(m)) candidateModels.push(m);
-      });
-
-      let lastErrText = '';
-
-      for (let i = 0; i < candidateModels.length; i++) {
-        let modelName = candidateModels[i];
-        try {
-          const resultText = await executeSingleGeminiCall(activeKey.key, modelName, contents, expectJson);
-          localStorage.setItem(STORAGE_KEYS.WORKING_MODEL, modelName);
-          return resultText;
-        } catch (err) {
-          lastErrText = err.message || String(err);
-
-          // Nếu thông báo lỗi của Google gợi ý trực tiếp tên model mới (VD: models/gemini-3.8-flash)
-          const suggestedMatch = lastErrText.match(/models\/(gemini-[a-zA-Z0-9.\-_]+)/);
-          if (suggestedMatch && suggestedMatch[1]) {
-            const suggestedModel = suggestedMatch[1];
-            if (!candidateModels.includes(suggestedModel)) {
-              candidateModels.splice(i + 1, 0, suggestedModel);
-              continue;
-            }
-          }
-
-          // Nếu lỗi là không tìm thấy model hoặc hết hỗ trợ cho user mới, tự động gọi danh sách model thực tế từ Key
-          if (lastErrText.includes('no longer available') || lastErrText.includes('not found') || lastErrText.includes('not supported')) {
-            try {
-              const listRes = await fetch('https://generativelanguage.googleapis.com/v1beta/models?key=' + encodeURIComponent(activeKey.key));
-              const listData = await listRes.json();
-              if (listData.models) {
-                for (let mObj of listData.models) {
-                  if (mObj.supportedGenerationMethods && mObj.supportedGenerationMethods.includes('generateContent')) {
-                    const cleanM = mObj.name.replace('models/', '');
-                    if (cleanM.includes('flash') && !candidateModels.includes(cleanM)) {
-                      candidateModels.push(cleanM);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#090d16">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PhoneFix AI">
+    <title>PhoneFix AI - Trợ Lý Sửa Chữa Điện Thoại</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter & JetBrains Mono for technical specs/model codes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        workbench: {
+                            950: '#070a12',
+                            900: '#0f1523',
+                            800: '#182235',
+                            700: '#24324c',
+                        }
                     }
-                  }
                 }
-              }
-            } catch (_) {}
-            continue;
-          }
-
-          // Nếu lỗi Key sai hoặc hết hạn mức Quota thì dừng ngay
-          if (lastErrText.includes('API_KEY_INVALID') || lastErrText.includes('quota')) {
-            throw new Error(lastErrText);
-          }
+            }
         }
-      }
+    </script>
 
-      throw new Error(lastErrText || 'Không thể kết nối tới Gemini API.');
-    }
+    <style>
+        /* Workbench Technical Background Pattern */
+        body {
+            background-color: #070a12;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 24px 24px, 24px 24px;
+            color: #f1f5f9;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+        }
 
-    async function executeSingleGeminiCall(apiKey, modelName, contents, expectJson) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
-      const generationConfig = {
-        temperature: 0.15
-      };
-      if (expectJson) {
-        generationConfig.responseMimeType = 'application/json';
-      }
+        /* Safe area padding for modern notched phones */
+        .pb-safe {
+            padding-bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px));
+        }
+        .bottom-nav-safe {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: contents,
-          generationConfig: generationConfig
-        })
-      });
+        /* Custom subtle scrollbars */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f1523;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #24324c;
+            border-radius: 9999px;
+        }
 
-      const data = await response.json();
-      if (!response.ok) {
-        const errMsg = (data && data.error && data.error.message) ? data.error.message : ('HTTP ' + response.status);
-        throw new Error(errMsg);
-      }
+        /* Laser Scanning Animation for Image Analysis */
+        @keyframes scanLaser {
+            0% { top: 4%; opacity: 0.9; }
+            50% { top: 92%; opacity: 1; }
+            100% { top: 4%; opacity: 0.9; }
+        }
+        .laser-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #10b981, #34d399, #10b981, transparent);
+            box-shadow: 0 0 15px 3px rgba(16, 185, 129, 0.7);
+            animation: scanLaser 2.2s ease-in-out infinite;
+            z-index: 20;
+        }
 
-      const text = data.candidates &&
-                   data.candidates[0] &&
-                   data.candidates[0].content &&
-                   data.candidates[0].content.parts &&
-                   data.candidates[0].content.parts[0] &&
-                   data.candidates[0].content.parts[0].text;
+        /* Pulse Glow Effect */
+        @keyframes pulseBorder {
+            0%, 100% { border-color: rgba(16, 185, 129, 0.4); }
+            50% { border-color: rgba(16, 185, 129, 0.9); }
+        }
+        .scanning-border {
+            animation: pulseBorder 1.5s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased selection:bg-emerald-500 selection:text-slate-950">
 
-      if (!text) {
-        throw new Error('AI không trả về dữ liệu văn bản.');
-      }
-      return text;
-    }
+    <!-- ================= TOP FIXED APP BAR ================= -->
+    <header class="sticky top-0 z-40 bg-workbench-950/90 backdrop-blur-md border-b border-slate-800/80 px-3.5 py-2.5">
+        <div class="max-w-2xl mx-auto flex items-center justify-between gap-2">
+            <!-- Brand & Title -->
+            <div class="flex items-center gap-2.5" onclick="switchTab('scan')" role="button">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-900/40 border border-emerald-400/30 shrink-0">
+                    <i class="fa-solid fa-screwdriver-wrench text-slate-950 text-lg"></i>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-white leading-none">PhoneFix <span class="text-emerald-400">AI</span></h1>
+                    <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 border border-slate-700 font-semibold">PRO</span>
+                </div>
+            </div>
 
-    // PROMPT GIÁM ĐỊNH PHẦN CỨNG CHÍNH XÁC CAO & KIỂM CHỨNG NGUỒN
-    function buildHardwareSystemPrompt(extraHint, manualQuery) {
-      return `Bạn là Kỹ sư Giám định Phần cứng Điện thoại & Giảng viên dạy nghề sửa chữa điện thoại di động thực chiến tại Việt Nam (chuẩn dữ liệu đối chiếu GSMArena, iFixit, DeviceSpecifications).
+            <!-- Right Status Badge & Quick Key Button -->
+            <div class="flex items-center gap-2">
+                <!-- API Key Status Pill -->
+                <button onclick="switchTab('settings')" id="headerKeyStatusBtn" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium border transition-all active:scale-95">
+                    <span id="headerKeyDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span id="headerKeyText" class="truncate max-w-[115px]">Chưa có Key</span>
+                </button>
 
-${manualQuery ? `NHIỆM VỤ: Người dùng yêu cầu tra cứu trực tiếp dòng máy: "${manualQuery}". Hãy chuẩn hóa tên máy thương mại chính xác nhất và cung cấp hồ sơ kỹ thuật tháo lắp thực chiến.` : `NHIỆM VỤ GIÁM ĐỊNH ẢNH BẮT BUỘC (4 BƯỚC ĐỐI CHIẾU HÌNH THÁI HỌC):
-1. Soi kỹ cụm Camera sau: Số lượng ống kính, hình dáng khung viền camera (viền bạc, bậc thang, hình viên thuốc, vuông hay tròn), vị trí đèn Flash LED nằm trong hay ngoài cụm cam.
-2. Soi vị trí Cảm biến vân tay (lưng máy, cạnh nguồn hay ẩn dưới màn), vị trí Logo hãng (in dọc hay ngang, góc trái hay chính giữa), và đọc mọi ký tự/mã Model nhỏ in ở mặt lưng (VD: SM-A..., M1908..., RMX..., CPH..., A2...).
-3. Phân tích chất liệu mặt lưng (nhựa bóng Glasstic, kính cong 2.5D/3D, nhôm nguyên khối) và cổng sạc/loa.
-4. Liệt kê các dòng máy có ngoại hình gần giống dễ nhầm lẫn nhất (VD: Redmi Note 8 vs Redmi Note 8 Pro / Redmi 8; Samsung A20 vs A30 / A10s / M20) và chỉ rõ đặc điểm quyết định vì sao bạn kết luận máy này.`}
+                <!-- Install PWA Quick Button (Shown when installable) -->
+                <button id="headerInstallBtn" onclick="triggerPwaInstall()" class="hidden items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 active:scale-95 transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span class="hidden sm:inline">Cài App</span>
+                </button>
+            </div>
+        </div>
+    </header>
 
-${extraHint ? `GHI CHÚ BỔ SUNG TỪ KỸ THUẬT VIÊN: "${extraHint}"` : ''}
+    <!-- ================= MAIN WORKSPACE CONTAINER ================= -->
+    <main class="flex-1 max-w-2xl w-full mx-auto px-3.5 pt-4 pb-safe">
 
-BẮT BUỘC TRẢ VỀ KẾT QUẢ DƯỚI DẠNG JSON HỢP LỆ THEO ĐÚNG CẤU TRÚC SAU (Không bọc trong markdown):
+        <!-- =============================================================== -->
+        <!-- TAB 1: NHẬN DIỆN & PHÂN TÍCH MÁY (SCAN / IDENTIFY)              -->
+        <!-- =============================================================== -->
+        <section id="tab-scan" class="space-y-4">
+            
+            <!-- Banner Reminder if No API Key is set -->
+            <div id="noKeyWarningBanner" class="hidden bg-amber-500/10 border border-amber-500/40 rounded-2xl p-3.5 flex items-start justify-between gap-3">
+                <div class="flex items-start gap-2.5">
+                    <i class="fa-solid fa-key text-amber-400 mt-0.5 text-base"></i>
+                    <div class="text-xs text-slate-200 leading-relaxed">
+                        <p class="font-bold text-amber-300">Chưa cấu hình Gemini API Key!</p>
+                        <p class="text-slate-300 mt-0.5">Hãy thêm API Key miễn phí của Google trong mục <b>Key & Cài App</b> để bắt đầu chụp ảnh nhận diện máy.</p>
+                    </div>
+                </div>
+                <button onclick="switchTab('settings')" class="shrink-0 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition active:scale-95">
+                    Nhập Key
+                </button>
+            </div>
+
+            <!-- Image Capture & Upload Card -->
+            <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-5 rounded-full bg-emerald-500"></span>
+                        <h2 class="font-bold text-sm sm:text-base text-white">Chụp Hoặc Tải Ảnh Điện Thoại</h2>
+                    </div>
+                </div>
+
+                <!-- Hidden File Inputs for Camera & Gallery -->
+                <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleImageSelect(event)">
+                <input type="file" id="galleryInput" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+
+                <!-- Dual Prominent Action Buttons (When no image selected) -->
+                <div id="captureButtonsContainer" class="grid grid-cols-2 gap-3 my-2">
+                    <!-- Direct Rear Camera Button -->
+                    <button onclick="document.getElementById('cameraInput').click()" class="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-gradient-to-b from-emerald-500/20 to-emerald-900/20 border-2 border-dashed border-emerald-500/50 hover:border-emerald-400 hover:bg-emerald-500/25 transition group active:scale-95">
+                        <div class="w-13 h-13 p-3.5 rounded-2xl bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition">
+                            <i class="fa-solid fa-camera text-2xl"></i>
+                        </div>
+                        <div class="text-center">
+                            <span class="block font-bold text-sm text-emerald-300">Chụp Trực Tiếp</span>
+                            <span class="block text-[11px] text-slate-400 mt-0.5">Mặt lưng / Cụm cam / Nội thất</span>
+                        </div>
+                    </button>
+
+                    <!-- Upload from Gallery Button -->
+                    <button onclick="document.getElementById('galleryInput').click()" class="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-workbench-800/70 border-2 border-dashed border-slate-700 hover:border-cyan-400/60 hover:bg-workbench-800 transition group active:scale-95">
+                        <div class="w-13 h-13 p-3.5 rounded-2xl bg-slate-800 text-cyan-400 border border-slate-700 group-hover:scale-105 transition">
+                            <i class="fa-solid fa-images text-2xl"></i>
+                        </div>
+                        <div class="text-center">
+                            <span class="block font-bold text-sm text-slate-200">Tải Ảnh Từ Máy</span>
+                            <span class="block text-[11px] text-slate-400 mt-0.5">Chọn ảnh có sẵn trong thư viện</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Image Preview Box (Shown after selecting/capturing photo) -->
+                <div id="imagePreviewWrapper" class="hidden space-y-3">
+                    <div id="previewFrame" class="relative rounded-2xl overflow-hidden bg-slate-950 border border-slate-700 max-h-80 flex items-center justify-center">
+                        <!-- Laser effect overlay during AI scan -->
+                        <div id="scanLaserOverlay" class="hidden laser-line"></div>
+                        <img id="previewImage" src="" alt="Ảnh điện thoại cần kiểm tra" class="max-h-80 w-auto object-contain mx-auto">
+                        
+                        <!-- Compression Badge -->
+                        <div id="compressionBadge" class="absolute bottom-2.5 left-2.5 bg-slate-950/85 backdrop-blur-md text-[11px] font-mono text-emerald-400 px-2.5 py-1 rounded-lg border border-slate-800">
+                            Đã tối ưu ảnh
+                        </div>
+
+                        <!-- Retake / Clear Photo Button -->
+                        <button onclick="clearSelectedImage()" class="absolute top-2.5 right-2.5 bg-rose-600/90 hover:bg-rose-500 text-white text-xs font-semibold px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-1.5 active:scale-95 transition">
+                            <i class="fa-solid fa-trash-can"></i> Đổi ảnh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Optional Technician Context Input -->
+                <div class="mt-3.5">
+                    <label for="techNotesInput" class="block text-xs font-medium text-slate-400 mb-1.5">
+                        <i class="fa-solid fa-comment-medical text-emerald-400 mr-1"></i> Ghi chú thêm cho AI (Tùy chọn):
+                    </label>
+                    <input type="text" id="techNotesInput" placeholder="VD: Mặt lưng kính nhám, chân sạc Type-C, máy bị liệt cảm ứng..." 
+                        class="w-full bg-workbench-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition">
+                </div>
+
+                <!-- Primary Analyze Action Button -->
+                <button id="analyzeBtn" onclick="analyzePhoneImage()" class="mt-3.5 w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 transition active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-microchip text-base"></i>
+                    <span>PHÂN TÍCH TÊN MÁY & HƯỚNG DẪN THÁO LẮP</span>
+                </button>
+
+                <!-- Photography Tip for Repair Students -->
+                <p class="text-[11px] text-slate-400 mt-2.5 text-center">
+                    <i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i> Mẹo: Chụp rõ <b>cụm camera sau</b>, <b>mặt lưng</b>, hoặc dòng chữ nhỏ ở <b>khay SIM / nắp lưng</b> để AI báo chuẩn mã máy nhất.
+                </p>
+            </div>
+
+            <!-- Loading Skeleton Status during Gemini Vision Call -->
+            <div id="loadingStatusCard" class="hidden bg-workbench-900 border border-emerald-500/40 rounded-2xl p-5 text-center space-y-3 scanning-border">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-sm" id="loadingStepTitle">Đang gửi ảnh tới Chuyên Gia Gemini AI...</h3>
+                    <p class="text-xs text-slate-400 mt-1" id="loadingStepDesc">Đang đối chiếu cụm camera, khung viền, vị trí cáp và sơ đồ tháo máy...</p>
+                </div>
+            </div>
+
+            <!-- =============================================================== -->
+            <!-- AI ANALYSIS RESULTS CONTAINER (Populated Dynamically)           -->
+            <!-- =============================================================== -->
+            <div id="analysisResultContainer" class="hidden space-y-4">
+                
+                <!-- 1. Primary Model Identification Card -->
+                <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none"></div>
+                    
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <span class="text-[11px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">
+                            <i class="fa-solid fa-check-double mr-1"></i> Kết Quả Nhận Diện
+                        </span>
+                        <span id="resConfidenceBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                            Độ chính xác: Cao
+                        </span>
+                    </div>
+
+                    <!-- Detected Model Name + Copy Button -->
+                    <div class="flex items-start justify-between gap-2 mt-1">
+                        <h2 id="resModelName" class="text-xl sm:text-2xl font-extrabold text-white tracking-tight leading-snug">
+                            Samsung Galaxy S22 Ultra 5G
+                        </h2>
+                        <button onclick="copyModelName()" title="Sao chép tên máy" class="shrink-0 p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center gap-1 border border-slate-700 active:scale-95 transition">
+                            <i class="fa-regular fa-copy"></i> <span class="text-[11px]">Copy</span>
+                        </button>
+                    </div>
+
+                    <!-- Hardware Model Codes (Crucial for ordering screens/flex cables) -->
+                    <div class="mt-2.5 flex items-center flex-wrap gap-1.5">
+                        <span class="text-xs text-slate-400">Mã Model / Phiên bản:</span>
+                        <span id="resModelCodes" class="font-mono text-xs text-cyan-300 bg-cyan-950/60 border border-cyan-800/60 px-2 py-0.5 rounded-md">
+                            SM-S908B, SM-S908U, SM-S908E
+                        </span>
+                    </div>
+
+                    <!-- Confidence Reasoning -->
+                    <p id="resConfidenceReason" class="mt-2.5 text-xs text-slate-300 bg-workbench-950/80 p-2.5 rounded-xl border border-slate-800/80 leading-relaxed">
+                        Nhận diện qua cụm 5 mắt camera sau tách rời không viền bao quanh, khung vuông vức có khe bút S-Pen ở cạnh đáy.
+                    </p>
+                </div>
+
+                <!-- 2. CRITICAL REPAIR & DISASSEMBLY WARNING CARD (Entry Method, Heat, Flex Cables, Step-by-Step) -->
+                <div class="bg-gradient-to-b from-amber-950/35 to-workbench-900 border-2 border-amber-500/50 rounded-2xl p-4 shadow-xl space-y-3.5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-sm sm:text-base text-amber-300 uppercase tracking-wide">Chỉ Dẫn Tháo Lắp & Cảnh Báo Đứt Cáp</h3>
+                                <p class="text-[11px] text-amber-200/70">Đọc kỹ trước khi đưa lên bàn nhiệt hoặc lách lam</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Entry Direction & Heating Temp Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <!-- Entry Method -->
+                        <div class="bg-workbench-950/90 border border-amber-500/30 rounded-xl p-3">
+                            <span class="text-[11px] text-slate-400 block font-medium">
+                                <i class="fa-solid fa-door-open text-amber-400 mr-1"></i> Hướng tháo mở máy:
+                            </span>
+                            <p id="resEntryMethod" class="font-bold text-sm text-white mt-1">
+                                Khò nhiệt mở từ Nắp Lưng (Back Glass)
+                            </p>
+                        </div>
+
+                        <!-- Heating Temperature -->
+                        <div class="bg-workbench-950/90 border border-rose-500/30 rounded-xl p-3">
+                            <span class="text-[11px] text-slate-400 block font-medium">
+                                <i class="fa-solid fa-temperature-high text-rose-400 mr-1"></i> Nhiệt độ & Thời gian gợi ý:
+                            </span>
+                            <p id="resHeatTemp" class="font-bold text-sm text-rose-300 mt-1">
+                                80°C - 90°C trong 2 - 3 phút (Dùng cồn 99% / 530)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Flex Cable Danger Zones -->
+                    <div class="bg-rose-950/40 border border-rose-500/40 rounded-xl p-3">
+                        <div class="flex items-center gap-1.5 text-rose-300 font-bold text-xs mb-1">
+                            <i class="fa-solid fa-scissors"></i>
+                            <span>VỊ TRÍ CÁP NGẦM DỄ ĐỨT KHI LÁCH MỞ:</span>
+                        </div>
+                        <p id="resFlexWarnings" class="text-xs text-slate-200 leading-relaxed">
+                            Cẩn thận cáp nối main-sub và cáp nút nguồn/âm lượng nằm sát cạnh phải. Không đưa miếng lách nhựa sâu quá 3mm ở khu vực dưới cụm camera và cạnh phải máy.
+                        </p>
+                    </div>
+
+                    <!-- Step-by-Step Disassembly Checklist -->
+                    <div class="bg-workbench-950/90 border border-emerald-500/30 rounded-xl p-3">
+                        <div class="flex items-center gap-1.5 text-emerald-300 font-bold text-xs mb-2">
+                            <i class="fa-solid fa-list-ol"></i>
+                            <span>QUY TRÌNH THÁO MÁY TỪNG BƯỚC CHO HỌC VIÊN:</span>
+                        </div>
+                        <ol id="resDisassemblySteps" class="space-y-1.5 text-xs text-slate-200 list-decimal list-inside leading-relaxed">
+                            <!-- Dynamically populated -->
+                        </ol>
+                    </div>
+
+                    <!-- Common Hardware Issues of this Model -->
+                    <div class="bg-workbench-950/80 border border-slate-800 rounded-xl p-3">
+                        <div class="flex items-center gap-1.5 text-cyan-300 font-bold text-xs mb-1">
+                            <i class="fa-solid fa-stethoscope"></i>
+                            <span>BỆNH THƯỜNG GẶP TRÊN DÒNG NÀY:</span>
+                        </div>
+                        <p id="resCommonIssues" class="text-xs text-slate-300 leading-relaxed">
+                            Hay gặp lỗi sọc màn hình hoặc trắng màn do cổ cáp (có thể ép lại cổ cáp), lỗi mất sóng hoặc chạm áp chân sạc do ẩm nước.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 3. VIDEO TEARDOWN & SCHEMATIC DEEP LINKS (1-CLICK PLATFORMS) -->
+                <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-5 rounded-full bg-red-500"></span>
+                            <h3 class="font-bold text-sm sm:text-base text-white">Video Tháo Lắp & Sơ Đồ Mạch</h3>
+                        </div>
+                        <span class="text-[11px] text-slate-400">Bấm để mở ngay</span>
+                    </div>
+
+                    <div id="resVideoLinksGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <!-- Dynamically populated by renderPlatformLinksInto(modelName) -->
+                    </div>
+                </div>
+
+                <!-- 4. DETAILED HARDWARE SPECS FOR REPLACEMENT PARTS -->
+                <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-5 rounded-full bg-cyan-400"></span>
+                        <h3 class="font-bold text-sm sm:text-base text-white">Thông Số Kỹ Thuật & Linh Kiện</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-2.5 text-xs">
+                        <!-- Display Specs -->
+                        <div class="bg-workbench-950 border border-slate-800/90 rounded-xl p-3 flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center shrink-0 mt-0.5">
+                                <i class="fa-solid fa-mobile-screen"></i>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 font-semibold block">Màn Hình & Cảm Ứng (Display):</span>
+                                <p id="resSpecDisplay" class="text-slate-200 mt-0.5 leading-relaxed font-medium">Dynamic AMOLED 2X, 6.8 inch, 120Hz, kính Gorilla Glass Victus+ (Màn cong 2 cạnh)</p>
+                            </div>
+                        </div>
+
+                        <!-- Battery & Charging Specs -->
+                        <div class="bg-workbench-950 border border-slate-800/90 rounded-xl p-3 flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                                <i class="fa-solid fa-battery-full"></i>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 font-semibold block">Pin & Sạc (Battery / Port):</span>
+                                <p id="resSpecBattery" class="text-slate-200 mt-0.5 leading-relaxed font-medium">5000 mAh (Mã pin: EB-BS908ABY), Sạc nhanh 45W, Cổng USB Type-C (cụm chân sạc rời)</p>
+                            </div>
+                        </div>
+
+                        <!-- Chipset & Frame Specs -->
+                        <div class="bg-workbench-950 border border-slate-800/90 rounded-xl p-3 flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
+                                <i class="fa-solid fa-microchip"></i>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 font-semibold block">Mainboard, Chip & Khung sườn:</span>
+                                <p id="resSpecHardware" class="text-slate-200 mt-0.5 leading-relaxed font-medium">Snapdragon 8 Gen 1 / Exynos 2200, RAM 8/12GB, Main 2 tầng ghép, khung Armor Aluminum</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. LOOK-ALIKE MODELS TO DISTINGUISH (Avoid buying wrong parts) -->
+                <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                    <div class="flex items-center gap-2 mb-2.5">
+                        <span class="w-2 h-5 rounded-full bg-amber-400"></span>
+                        <h3 class="font-bold text-sm text-white">Dòng Máy Ngoại Hình Giống (Tránh Nhầm Linh Kiện)</h3>
+                    </div>
+                    <div id="resSimilarModelsList" class="space-y-2 text-xs text-slate-300">
+                        <!-- Dynamically rendered -->
+                    </div>
+                </div>
+
+                <!-- 6. FOLLOW-UP AI REPAIR ASSISTANT Q&A FOR THIS PHONE -->
+                <div class="bg-workbench-900 border border-emerald-500/30 rounded-2xl p-4 shadow-xl space-y-3">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-robot text-emerald-400"></i>
+                        <h3 class="font-bold text-sm text-white">Hỏi Thêm AI Về Pan Bệnh Của Máy Này</h3>
+                    </div>
+                    
+                    <!-- Chat Conversation History for current phone -->
+                    <div id="followUpChatBox" class="space-y-2.5 max-h-72 overflow-y-auto pr-1 text-xs">
+                        <div class="bg-workbench-950 border border-slate-800 rounded-xl p-3 text-slate-300">
+                            Bạn cần hỏi thêm về cách đo đạc, vị trí IC, mã màn hình dùng chung hay cách trị pan bệnh của chiếc máy này? Hãy nhập câu hỏi bên dưới.
+                        </div>
+                    </div>
+
+                    <!-- Quick Prompt Pills -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                        <button onclick="setQuickQuestion('Màn hình máy này có dùng chung với dòng nào khác không?')" class="shrink-0 text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg border border-slate-700">Màn hình dùng chung?</button>
+                        <button onclick="setQuickQuestion('Cách tách màn hình hoặc nắp lưng máy này an toàn nhất cho người mới?')" class="shrink-0 text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg border border-slate-700">Cách tháo an toàn?</button>
+                        <button onclick="setQuickQuestion('Máy này sạc không vào / mất nguồn thì kiểm tra những gì trước?')" class="shrink-0 text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg border border-slate-700">Sạc không vào / Mất nguồn?</button>
+                    </div>
+
+                    <!-- Question Input & Send -->
+                    <div class="flex gap-2">
+                        <input type="text" id="followUpInput" placeholder="Hỏi cách tháo, đo chạm, linh kiện thay thế..." 
+                            onkeydown="if(event.key === 'Enter') askFollowUpQuestion()"
+                            class="flex-1 bg-workbench-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white outline-none">
+                        <button id="followUpSendBtn" onclick="askFollowUpQuestion()" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shrink-0 flex items-center gap-1.5 transition active:scale-95">
+                            <i class="fa-solid fa-paper-plane"></i> Gửi
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- TAB 2: LỊCH SỬ ĐÃ QUÉT (SAVED LOCAL HISTORY)                    -->
+        <!-- =============================================================== -->
+        <section id="tab-history" class="hidden space-y-4">
+            <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <div>
+                        <h2 class="font-bold text-base text-white flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i>
+                            Lịch Sử Máy Đã Tra Cứu
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Lưu trực tiếp trên máy — Xem lại không tốn lượt gọi API</p>
+                    </div>
+                    <button onclick="clearAllHistory()" id="clearHistoryBtn" class="text-xs text-rose-400 hover:text-rose-300 bg-rose-950/40 border border-rose-800/50 px-2.5 py-1.5 rounded-xl transition active:scale-95">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Xoá hết
+                    </button>
+                </div>
+
+                <!-- Search Filter in History -->
+                <div class="relative mb-3">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-500 text-xs"></i>
+                    <input type="text" id="historySearchInput" oninput="renderHistoryList()" placeholder="Tìm theo tên máy hoặc mã model đã lưu..." 
+                        class="w-full bg-workbench-950 border border-slate-800 focus:border-emerald-500 rounded-xl pl-9 pr-3.5 py-2 text-xs sm:text-sm text-white outline-none">
+                </div>
+
+                <!-- History Cards List -->
+                <div id="historyListContainer" class="space-y-2.5">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- TAB 3: CÔNG CỤ THỢ (MANUAL SEARCH & REPAIR CHEAT SHEET)         -->
+        <!-- =============================================================== -->
+        <section id="tab-tools" class="hidden space-y-4">
+            <!-- Manual Quick Model Link Generator -->
+            <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-5 rounded-full bg-cyan-400"></span>
+                    <div>
+                        <h2 class="font-bold text-base text-white">Tra Cứu Nhanh Theo Tên Máy</h2>
+                        <p class="text-xs text-slate-400">Nhập tên máy bất kỳ để tạo ngay link Video Tháo Lắp, Ép Kính, Sơ Đồ Mạch</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" id="manualModelInput" placeholder="VD: Redmi Note 12 Pro, iPhone 14 Plus, Oppo Reno8..." 
+                        oninput="updateManualSearchLinks()"
+                        class="flex-1 bg-workbench-950 border border-slate-800 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none">
+                </div>
+
+                <!-- Preset Popular Models for Students -->
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px]">
+                    <span class="text-slate-400 shrink-0">Thử nhanh:</span>
+                    <button onclick="setManualModel('Redmi Note 8')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 border border-slate-700">Redmi Note 8</button>
+                    <button onclick="setManualModel('iPhone 13 Pro Max')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 border border-slate-700">iPhone 13 Pro Max</button>
+                    <button onclick="setManualModel('Samsung Galaxy A54 5G')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 border border-slate-700">Galaxy A54 5G</button>
+                    <button onclick="setManualModel('Oppo A57')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 border border-slate-700">Oppo A57</button>
+                </div>
+
+                <!-- Generated Links Grid -->
+                <div id="manualLinksContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                    <!-- Populated by updateManualSearchLinks() -->
+                </div>
+            </div>
+
+            <!-- Repair Student Reference Card: Temperature & Solvents Cheat Sheet -->
+            <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-5 rounded-full bg-amber-400"></span>
+                    <h3 class="font-bold text-sm sm:text-base text-white">Sổ Tay Nhiệt Độ & Hóa Chất Cho Học Viên</h3>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                    <div class="bg-workbench-950 border border-slate-800 rounded-xl p-3">
+                        <span class="font-bold text-amber-400 block mb-1"><i class="fa-solid fa-fire-burner mr-1"></i> Bàn Nhiệt Tách Lưng / Màn:</span>
+                        <ul class="space-y-1 text-slate-300 list-disc list-inside">
+                            <li><b>Nắp lưng kính/nhựa:</b> 75°C – 85°C (2-3 phút)</li>
+                            <li><b>Tách màn hình AMOLED:</b> 80°C – 90°C</li>
+                            <li><b>Tách ron iPhone (12 trở lên):</b> 85°C – 95°C + cồn 99%</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-workbench-950 border border-slate-800 rounded-xl p-3">
+                        <span class="font-bold text-cyan-400 block mb-1"><i class="fa-solid fa-flask-vial mr-1"></i> Lưu Ý Dung Dịch Tách Keo:</span>
+                        <ul class="space-y-1 text-slate-300 list-disc list-inside">
+                            <li><b>Màn AMOLED / OLED:</b> Dùng Cồn Isopropyl 99% thoải mái, không lo ố phản quang.</li>
+                            <li><b>Màn IPS LCD (có phản quang):</b> <span class="text-rose-400 font-semibold">TUYỆT ĐỐI hạn chế nhỏ cồn/530</span> tràn vào mép gây ố loang phản quang.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- TAB 4: CÀI ĐẶT API KEY & CÀI APP PWA (SETTINGS & PWA)           -->
+        <!-- =============================================================== -->
+        <section id="tab-settings" class="hidden space-y-4">
+            
+            <!-- 1. Gemini API Key Manager Card -->
+            <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-4">
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <h2 class="font-bold text-base text-white flex items-center gap-2">
+                            <i class="fa-solid fa-key text-emerald-400"></i>
+                            Quản Lý Gemini API Key
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Key được lưu an toàn 100% trong bộ nhớ trình duyệt (<code class="text-emerald-300">localStorage</code>) trên điện thoại của bạn.</p>
+                    </div>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" 
+                        class="shrink-0 px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 text-xs font-bold flex items-center gap-1.5 transition">
+                        <span>Lấy Key Free</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- Form to Add a New API Key -->
+                <div class="bg-workbench-950 border border-slate-800 rounded-xl p-3.5 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Thêm API Key Mới</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <input type="text" id="newKeyLabelInput" placeholder="Tên gợi nhớ (VD: Key 1)" 
+                            class="bg-workbench-900 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none">
+                        <div class="sm:col-span-2 relative">
+                            <input type="password" id="newKeyValueInput" placeholder="Dán mã AIzaSy... vào đây" 
+                                class="w-full bg-workbench-900 border border-slate-800 focus:border-emerald-500 rounded-xl pl-3 pr-9 py-2 text-xs sm:text-sm font-mono text-white outline-none">
+                            <button type="button" onclick="toggleNewKeyVisibility()" class="absolute right-2.5 top-2 text-slate-400 hover:text-white text-xs p-0.5">
+                                <i id="newKeyEyeIcon" class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="addNewApiKey()" class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95">
+                            <i class="fa-solid fa-plus"></i> Lưu Key Vào Thiết Bị
+                        </button>
+                        <button onclick="testActiveApiKey()" id="testKeyBtn" class="py-2.5 px-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition active:scale-95">
+                            <i class="fa-solid fa-plug-circle-check"></i> Kiểm Tra Key & Dò Model
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Saved API Keys List -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-xs text-slate-400">
+                        <span>Danh sách Key đã lưu trên máy:</span>
+                        <span id="savedKeysCountBadge" class="font-mono text-emerald-400">0 key</span>
+                    </div>
+                    <div id="savedKeysListContainer" class="space-y-2">
+                        <!-- Dynamically rendered via JS -->
+                    </div>
+                </div>
+
+                <!-- AI Model Selection (With Smart Auto-Discovery & Anti-Deprecation) -->
+                <div class="pt-3 border-t border-slate-800/80 space-y-2.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <label for="modelSelectDropdown" class="block text-xs font-bold text-slate-200">
+                            <i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Chọn Model AI (Chống lỗi ngừng hỗ trợ):
+                        </label>
+                        <button onclick="discoverModelsFromKeyUI()" id="discoverModelsBtn" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 flex items-center gap-1 transition active:scale-95">
+                            <i class="fa-solid fa-Arrows-rotate"></i> Dò danh sách Model từ Key
+                        </button>
+                    </div>
+
+                    <select id="modelSelectDropdown" onchange="handleModelSelectionChange()" 
+                        class="w-full bg-workbench-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-xs sm:text-sm text-white outline-none">
+                        <option value="auto">✨ Tự động dò Model mới nhất (Khuyên dùng - Không lo lỗi Model)</option>
+                        <option value="gemini-3.0-flash">gemini-3.0-flash (Mới nhất cho Key mới)</option>
+                        <option value="gemini-3-flash-preview">gemini-3-flash-preview (Bản Gemini 3 Flash)</option>
+                        <option value="gemini-2.5-flash">gemini-2.5-flash (Bản 2.5 Flash)</option>
+                        <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Siêu nhanh, tiết kiệm)</option>
+                        <option value="gemini-2.5-pro">gemini-2.5-pro (Chuyên sâu cho pan khó)</option>
+                        <option value="custom">✍️ Tự nhập tên Model bất kỳ...</option>
+                    </select>
+
+                    <!-- Status info of currently resolved model -->
+                    <div class="bg-workbench-950/90 border border-slate-800/90 rounded-xl p-2.5 text-[11px] text-slate-400 flex items-center justify-between gap-2">
+                        <span>Model thực tế đang hoạt động:</span>
+                        <span id="resolvedActiveModelBadge" class="font-mono font-semibold text-emerald-400">gemini-3.0-flash (Auto)</span>
+                    </div>
+
+                    <!-- Custom Model ID Input (Hidden unless 'custom' selected) -->
+                    <div id="customModelInputWrapper" class="hidden pt-1">
+                        <input type="text" id="customModelIdInput" oninput="saveCustomModelId()" placeholder="Nhập mã model (VD: gemini-3.0-flash)" 
+                            class="w-full bg-workbench-950 border border-cyan-500/50 rounded-xl px-3 py-2 text-xs font-mono text-cyan-300 outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. PWA Installation & Standalone File Download Card -->
+            <div class="bg-workbench-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3.5">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-5 rounded-full bg-emerald-400"></span>
+                    <div>
+                        <h2 class="font-bold text-base text-white">Cài Đặt Thành App Trên Điện Thoại (PWA)</h2>
+                        <p class="text-xs text-slate-400">Sử dụng toàn màn hình như ứng dụng thật, dùng lâu dài hoàn toàn miễn phí</p>
+                    </div>
+                </div>
+
+                <!-- Instructions for Android & iOS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                    <div class="bg-workbench-950 border border-slate-800 rounded-xl p-3 space-y-1.5">
+                        <div class="font-bold text-emerald-400 flex items-center gap-1.5">
+                            <i class="fa-brands fa-android text-base"></i> Trên Android (Chrome):
+                        </div>
+                        <p class="text-slate-300 leading-relaxed">
+                            Bấm vào biểu tượng <b>3 chấm dọc (⋮)</b> ở góc trên trình duyệt Chrome <i class="fa-solid fa-arrow-right text-[10px] mx-0.5"></i> chọn <b>"Thêm vào màn hình chính"</b> hoặc <b>"Cài đặt ứng dụng"</b>.
+                        </p>
+                    </div>
+
+                    <div class="bg-workbench-950 border border-slate-800 rounded-xl p-3 space-y-1.5">
+                        <div class="font-bold text-cyan-400 flex items-center gap-1.5">
+                            <i class="fa-brands fa-apple text-base"></i> Trên iPhone (Safari):
+                        </div>
+                        <p class="text-slate-300 leading-relaxed">
+                            Bấm nút <b>Chia sẻ (Share <i class="fa-solid fa-arrow-up-from-bracket"></i>)</b> ở thanh dưới cùng Safari <i class="fa-solid fa-arrow-right text-[10px] mx-0.5"></i> kéo xuống chọn <b>"Thêm vào MH chính" (Add to Home Screen)</b>.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Export PWA Files for Free Hosting (Netlify Drop / GitHub Pages) -->
+                <div class="bg-workbench-950 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
+                    <p class="text-xs font-bold text-slate-200">
+                        <i class="fa-solid fa-cloud-arrow-down text-cyan-400 mr-1"></i> Tải Bộ File Mã Nguồn PWA (Để tự host lên Netlify / GitHub):
+                    </p>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                        Bạn có thể tải 3 file dưới đây về máy, sau đó kéo thả thư mục lên <b>app.netlify.com/drop</b> để có đường link HTTPS riêng cài làm App vĩnh viễn:
+                    </p>
+                    <div class="grid grid-cols-3 gap-2 pt-1">
+                        <button onclick="downloadSelfHtml()" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 text-xs font-mono font-semibold flex items-center justify-center gap-1 transition active:scale-95">
+                            <i class="fa-solid fa-file-code"></i> index.html
+                        </button>
+                        <button onclick="downloadManifestFile()" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 text-xs font-mono font-semibold flex items-center justify-center gap-1 transition active:scale-95">
+                            <i class="fa-solid fa-file-lines"></i> manifest.json
+                        </button>
+                        <button onclick="downloadServiceWorkerFile()" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs font-mono font-semibold flex items-center justify-center gap-1 transition active:scale-95">
+                            <i class="fa-solid fa-gears"></i> sw.js
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ================= BOTTOM NAVIGATION BAR (MOBILE ONE-HANDED) ================= -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-workbench-950/95 backdrop-blur-lg border-t border-slate-800/90 bottom-nav-safe">
+        <div class="max-w-2xl mx-auto grid grid-cols-4 px-2 py-1.5">
+            <!-- Tab 1: Scan -->
+            <button onclick="switchTab('scan')" id="nav-btn-scan" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-white transition active:scale-95">
+                <i class="fa-solid fa-camera text-lg"></i>
+                <span class="text-[11px] font-bold mt-1">Nhận Diện</span>
+            </button>
+
+            <!-- Tab 2: History -->
+            <button onclick="switchTab('history')" id="nav-btn-history" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95 relative">
+                <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+                <span class="text-[11px] font-medium mt-1">Lịch Sử</span>
+                <span id="navHistoryCount" class="hidden absolute top-1 right-6 bg-emerald-500 text-slate-950 text-[9px] font-extrabold px-1.5 rounded-full">0</span>
+            </button>
+
+            <!-- Tab 3: Repair Tools -->
+            <button onclick="switchTab('tools')" id="nav-btn-tools" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95">
+                <i class="fa-solid fa-toolbox text-lg"></i>
+                <span class="text-[11px] font-medium mt-1">Công Cụ Thợ</span>
+            </button>
+
+            <!-- Tab 4: Settings & API Key -->
+            <button onclick="switchTab('settings')" id="nav-btn-settings" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 hover:text-slate-300 transition active:scale-95">
+                <i class="fa-solid fa-key text-lg"></i>
+                <span class="text-[11px] font-medium mt-1">Key & Cài App</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ================= CUSTOM TOAST NOTIFICATION ================= -->
+    <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center gap-2 w-11/12 max-w-sm"></div>
+
+    <!-- ================= APPLICATION LOGIC (JAVASCRIPT) ================= -->
+    <script>
+        /********************************************************************
+         * 1. STATE & LOCALSTORAGE KEYS
+         ********************************************************************/
+        const STORAGE_KEYS = {
+            API_KEYS_LIST: 'phonefix_gemini_keys',          // Array of { id, label, key, createdAt }
+            ACTIVE_KEY_ID: 'phonefix_active_key_id',        // ID of selected key
+            SELECTED_MODEL: 'phonefix_selected_model_v2',   // 'auto' by default so old deprecated model settings are upgraded
+            CACHED_WORKING_MODEL: 'phonefix_working_model', // Last verified working model ID
+            DISCOVERED_MODELS: 'phonefix_discovered_models',// Array of model names fetched from API
+            SCAN_HISTORY: 'phonefix_scan_history'           // Array of saved phone scans
+        };
+
+        // Ordered fallback candidates (newest & most reliable first)
+        const FALLBACK_MODEL_PRIORITY = [
+            'gemini-3.0-flash',
+            'gemini-3-flash-preview',
+            'gemini-2.5-flash',
+            'gemini-2.5-flash-lite',
+            'gemini-3.0-pro',
+            'gemini-2.5-pro',
+            'gemini-2.0-flash'
+        ];
+
+        let currentCompressedBase64 = null; // Base64 string without data:image/jpeg;base64, prefix
+        let currentThumbnailDataUrl = null; // Smaller thumbnail for saving in localStorage history
+        let currentAnalysisData = null;     // Currently displayed phone analysis object
+        let deferredPwaPrompt = null;       // PWA install prompt event
+
+        /********************************************************************
+         * 2. INITIALIZATION ON WINDOW LOAD
+         ********************************************************************/
+        window.addEventListener('DOMContentLoaded', () => {
+            initPwaManifestAndServiceWorker();
+            populateDiscoveredModelsInDropdown();
+            loadSavedSettingsUI();
+            renderHistoryList();
+            setManualModel('Redmi Note 8');
+        });
+
+        // Listen for PWA Installable event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPwaPrompt = e;
+            const installBtn = document.getElementById('headerInstallBtn');
+            installBtn.classList.remove('hidden');
+            installBtn.classList.add('flex');
+        });
+
+        function triggerPwaInstall() {
+            if (!deferredPwaPrompt) {
+                switchTab('settings');
+                showToast('Xem hướng dẫn Thêm vào màn hình chính ở mục Cài App!', 'info');
+                return;
+            }
+            deferredPwaPrompt.prompt();
+            deferredPwaPrompt.userChoice.then(() => {
+                deferredPwaPrompt = null;
+                document.getElementById('headerInstallBtn').classList.add('hidden');
+            });
+        }
+
+        /********************************************************************
+         * 3. TAB NAVIGATION CONTROLLER
+         ********************************************************************/
+        function switchTab(tabName) {
+            const tabs = ['scan', 'history', 'tools', 'settings'];
+            tabs.forEach(t => {
+                const section = document.getElementById(`tab-${t}`);
+                const navBtn = document.getElementById(`nav-btn-${t}`);
+                const labelSpan = navBtn.querySelector('span:not(#navHistoryCount)');
+                if (t === tabName) {
+                    section.classList.remove('hidden');
+                    navBtn.classList.remove('text-slate-500', 'text-slate-400', 'text-emerald-400');
+                    navBtn.classList.add('text-white');
+                    if (labelSpan) {
+                        labelSpan.classList.remove('font-medium');
+                        labelSpan.classList.add('font-bold');
+                    }
+                } else {
+                    section.classList.add('hidden');
+                    navBtn.classList.remove('text-white', 'text-emerald-400', 'text-slate-400');
+                    navBtn.classList.add('text-slate-500');
+                    if (labelSpan) {
+                        labelSpan.classList.remove('font-bold');
+                        labelSpan.classList.add('font-medium');
+                    }
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /********************************************************************
+         * 4. TOAST NOTIFICATION HELPER (NO ALERT/CONFIRM)
+         ********************************************************************/
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const colorMap = {
+                success: 'bg-emerald-950/95 border-emerald-500/60 text-emerald-200',
+                warning: 'bg-amber-950/95 border-amber-500/60 text-amber-200',
+                error: 'bg-rose-950/95 border-rose-500/60 text-rose-200',
+                info: 'bg-slate-900/95 border-cyan-500/60 text-cyan-200'
+            };
+            const iconMap = {
+                success: 'fa-circle-check text-emerald-400',
+                warning: 'fa-triangle-exclamation text-amber-400',
+                error: 'fa-circle-xmark text-rose-400',
+                info: 'fa-circle-info text-cyan-400'
+            };
+
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-2xl backdrop-blur-md text-xs font-semibold transition-all duration-300 ${colorMap[type] || colorMap.info}`;
+            toast.innerHTML = `<i class="fa-solid ${iconMap[type] || iconMap.info} text-sm shrink-0"></i><span class="leading-relaxed">${escapeHtml(message)}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-8px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3800);
+        }
+
+        /********************************************************************
+         * 5. GEMINI API KEY & SMART MODEL FALLBACK ENGINE
+         ********************************************************************/
+        function getSavedApiKeys() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.API_KEYS_LIST);
+                return raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveApiKeysList(keysArray) {
+            localStorage.setItem(STORAGE_KEYS.API_KEYS_LIST, JSON.stringify(keysArray));
+        }
+
+        function getActiveApiKeyObj() {
+            const keys = getSavedApiKeys();
+            if (keys.length === 0) return null;
+            const activeId = localStorage.getItem(STORAGE_KEYS.ACTIVE_KEY_ID);
+            return keys.find(k => k.id === activeId) || keys[0];
+        }
+
+        function getSelectedModelSetting() {
+            return localStorage.getItem(STORAGE_KEYS.SELECTED_MODEL) || 'auto';
+        }
+
+        function getInitialModelToTry() {
+            const setting = getSelectedModelSetting();
+            if (setting && setting !== 'auto') {
+                return setting;
+            }
+            const cachedWorking = localStorage.getItem(STORAGE_KEYS.CACHED_WORKING_MODEL);
+            if (cachedWorking) {
+                return cachedWorking;
+            }
+            return 'gemini-3.0-flash';
+        }
+
+        /**
+         * Queries Google's /v1beta/models endpoint to discover all models available
+         * to the user's specific API Key that support `generateContent`.
+         */
+        async function fetchAvailableModelsForKey(apiKey) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+                if (!response.ok) return [];
+                const data = await response.json();
+                const models = Array.isArray(data.models) ? data.models : [];
+
+                // Filter models that support generateContent and are multimodal/text Gemini models
+                const supported = models
+                    .filter(m => {
+                        const methods = m.supportedGenerationMethods || [];
+                        const name = (m.name || '').toLowerCase();
+                        if (!methods.includes('generateContent')) return false;
+                        // Exclude specialized non-vision/text models (tts, embedding, imagen, veo, aqa)
+                        if (name.includes('embedding') || name.includes('tts') || name.includes('imagen') || name.includes('veo') || name.includes('aqa') || name.includes('bisheng')) {
+                            return false;
+                        }
+                        return name.includes('gemini');
+                    })
+                    .map(m => m.name.replace(/^models\//, ''));
+
+                // Sort so flash models and newer versions (3.x > 2.5 > 2.0) come first
+                supported.sort((a, b) => {
+                    const score = (id) => {
+                        let s = 0;
+                        if (id === 'gemini-3.0-flash') s += 1000;
+                        if (id === 'gemini-3-flash-preview') s += 950;
+                        if (id.includes('gemini-3')) s += 500;
+                        else if (id.includes('gemini-2.5')) s += 300;
+                        else if (id.includes('gemini-2.0')) s += 100;
+                        if (id.includes('flash') && !id.includes('lite')) s += 80;
+                        if (id.includes('flash-lite')) s += 40;
+                        if (!id.includes('exp') && !id.includes('001')) s += 20;
+                        return s;
+                    };
+                    return score(b) - score(a);
+                });
+
+                if (supported.length > 0) {
+                    localStorage.setItem(STORAGE_KEYS.DISCOVERED_MODELS, JSON.stringify(supported));
+                    populateDiscoveredModelsInDropdown();
+                }
+                return supported;
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function populateDiscoveredModelsInDropdown() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.DISCOVERED_MODELS);
+                if (!raw) return;
+                const list = JSON.parse(raw);
+                if (!Array.isArray(list) || list.length === 0) return;
+
+                const dropdown = document.getElementById('modelSelectDropdown');
+                const currentVal = dropdown.value;
+
+                // Keep static options and add any newly discovered models before 'custom'
+                const existingValues = new Set(Array.from(dropdown.options).map(o => o.value));
+                const customOpt = dropdown.querySelector('option[value="custom"]');
+
+                list.forEach(modelId => {
+                    if (!existingValues.has(modelId)) {
+                        const opt = document.createElement('option');
+                        opt.value = modelId;
+                        opt.textContent = `${modelId} (Đã dò từ Key)`;
+                        dropdown.insertBefore(opt, customOpt);
+                        existingValues.add(modelId);
+                    }
+                });
+
+                dropdown.value = currentVal;
+            } catch (e) {
+                // Ignore JSON parse errors
+            }
+        }
+
+        /**
+         * Universal wrapper that calls Gemini generateContent with automatic model fallback
+         * if a model is deprecated ("no longer available to new users") or not found (404/400).
+         */
+        async function callGeminiWithAutoFallback(apiKey, payloadBody, onStatusUpdate) {
+            const triedModels = new Set();
+            let candidateQueue = [getInitialModelToTry(), ...FALLBACK_MODEL_PRIORITY];
+
+            // Remove duplicates while preserving order
+            candidateQueue = [...new Set(candidateQueue)];
+
+            let hasFetchedDynamicModels = false;
+            let lastErrorMessage = 'Không thể kết nối tới Gemini API';
+
+            while (candidateQueue.length > 0) {
+                const modelId = candidateQueue.shift();
+                if (!modelId || triedModels.has(modelId)) continue;
+                triedModels.add(modelId);
+
+                if (typeof onStatusUpdate === 'function') {
+                    onStatusUpdate(modelId);
+                }
+
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payloadBody)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.candidates) {
+                        // Save this working model so subsequent requests are instant!
+                        localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, modelId);
+                        // If user had a hardcoded broken model selected, switch them to the working one
+                        const currentSetting = getSelectedModelSetting();
+                        if (currentSetting !== 'auto' && currentSetting !== modelId) {
+                            localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, 'auto');
+                            showToast(`Đã tự động chuyển sang model mới: ${modelId}`, 'info');
+                        }
+                        loadSavedSettingsUI();
+                        return { data, usedModel: modelId };
+                    }
+
+                    const errMsg = data.error?.message || `HTTP ${response.status}`;
+                    lastErrorMessage = errMsg;
+
+                    // Check if the error is an API Key invalid error or quota error (no point trying another model if key itself is invalid)
+                    const lowerErr = errMsg.toLowerCase();
+                    if (lowerErr.includes('api_key_invalid') || lowerErr.includes('api key not valid')) {
+                        throw new Error('API Key không hợp lệ. Vui lòng kiểm tra lại mã Key trong mục Cài đặt.');
+                    }
+
+                    // Check if Google's error message explicitly recommends a replacement model
+                    // e.g., "Please update your code to use models/gemini-3.0-flash for the latest features"
+                    const suggestedMatch = errMsg.match(/models\/([a-zA-Z0-9.\-_]+)/i);
+                    if (suggestedMatch && suggestedMatch[1]) {
+                        const suggestedModel = suggestedMatch[1].trim();
+                        if (!triedModels.has(suggestedModel)) {
+                            candidateQueue.unshift(suggestedModel);
+                        }
+                    }
+
+                    // If model is unavailable / deprecated / 404 / 400, dynamically query /v1beta/models once
+                    const isModelIssue = response.status === 404 || response.status === 400 ||
+                        lowerErr.includes('no longer available') ||
+                        lowerErr.includes('not found') ||
+                        lowerErr.includes('not supported') ||
+                        lowerErr.includes('deprecated');
+
+                    if (isModelIssue && !hasFetchedDynamicModels) {
+                        hasFetchedDynamicModels = true;
+                        const discovered = await fetchAvailableModelsForKey(apiKey);
+                        discovered.forEach(dm => {
+                            if (!triedModels.has(dm)) {
+                                candidateQueue.push(dm);
+                            }
+                        });
+                    } else if (!isModelIssue) {
+                        // Non-model error (e.g. safety block or rate limit)
+                        break;
+                    }
+
+                } catch (networkOrFatalErr) {
+                    if (networkOrFatalErr.message.includes('API Key không hợp lệ')) {
+                        throw networkOrFatalErr;
+                    }
+                    lastErrorMessage = networkOrFatalErr.message;
+                }
+            }
+
+            throw new Error(lastErrorMessage);
+        }
+
+        // Button in Settings to manually discover models from the active API Key
+        async function discoverModelsFromKeyUI() {
+            const activeObj = getActiveApiKeyObj();
+            if (!activeObj) {
+                showToast('Vui lòng thêm và chọn 1 API Key trước khi dò Model!', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('discoverModelsBtn');
+            const origHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang dò...`;
+
+            try {
+                const list = await fetchAvailableModelsForKey(activeObj.key);
+                if (list.length > 0) {
+                    localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, list[0]);
+                    localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, 'auto');
+                    loadSavedSettingsUI();
+                    showToast(`Đã tìm thấy ${list.length} model khả dụng! Đã chọn: ${list[0]}`, 'success');
+                } else {
+                    showToast('Không lấy được danh sách model. Hãy kiểm tra lại Key hoặc mạng.', 'warning');
+                }
+            } catch (e) {
+                showToast('Lỗi khi dò danh sách Model từ Google.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+            }
+        }
+
+        function toggleNewKeyVisibility() {
+            const input = document.getElementById('newKeyValueInput');
+            const icon = document.getElementById('newKeyEyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-regular fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-regular fa-eye';
+            }
+        }
+
+        async function addNewApiKey() {
+            const labelInput = document.getElementById('newKeyLabelInput');
+            const keyInput = document.getElementById('newKeyValueInput');
+            const rawKey = keyInput.value.trim();
+            const label = labelInput.value.trim() || `Key ${getSavedApiKeys().length + 1}`;
+
+            if (!rawKey || rawKey.length < 20) {
+                showToast('Vui lòng dán mã Gemini API Key hợp lệ (bắt đầu bằng AIza...)', 'warning');
+                return;
+            }
+
+            const keys = getSavedApiKeys();
+            const newId = 'key_' + Date.now();
+            keys.push({
+                id: newId,
+                label: label,
+                key: rawKey,
+                createdAt: new Date().toLocaleDateString('vi-VN')
+            });
+
+            saveApiKeysList(keys);
+            localStorage.setItem(STORAGE_KEYS.ACTIVE_KEY_ID, newId);
+
+            labelInput.value = '';
+            keyInput.value = '';
+            loadSavedSettingsUI();
+            showToast(`Đã lưu "${label}"! Đang tự động dò Model mới nhất cho Key...`, 'success');
+
+            // Automatically discover the best model for this new key in the background
+            const discovered = await fetchAvailableModelsForKey(rawKey);
+            if (discovered.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, discovered[0]);
+                loadSavedSettingsUI();
+            }
+        }
+
+        function selectActiveApiKey(id) {
+            localStorage.setItem(STORAGE_KEYS.ACTIVE_KEY_ID, id);
+            loadSavedSettingsUI();
+            showToast('Đã chuyển đổi API Key đang sử dụng!', 'info');
+        }
+
+        function deleteApiKey(id) {
+            let keys = getSavedApiKeys();
+            keys = keys.filter(k => k.id !== id);
+            saveApiKeysList(keys);
+
+            const currentActive = localStorage.getItem(STORAGE_KEYS.ACTIVE_KEY_ID);
+            if (currentActive === id) {
+                localStorage.setItem(STORAGE_KEYS.ACTIVE_KEY_ID, keys.length > 0 ? keys[0].id : '');
+            }
+            loadSavedSettingsUI();
+            showToast('Đã xoá API Key khỏi thiết bị.', 'warning');
+        }
+
+        function handleModelSelectionChange() {
+            const dropdown = document.getElementById('modelSelectDropdown');
+            const customWrapper = document.getElementById('customModelInputWrapper');
+            if (dropdown.value === 'custom') {
+                customWrapper.classList.remove('hidden');
+                const customVal = document.getElementById('customModelIdInput').value.trim();
+                if (customVal) {
+                    localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, customVal);
+                    localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, customVal);
+                }
+            } else {
+                customWrapper.classList.add('hidden');
+                localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, dropdown.value);
+                if (dropdown.value !== 'auto') {
+                    localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, dropdown.value);
+                }
+                showToast(`Đã chuyển chế độ Model: ${dropdown.value === 'auto' ? 'Tự động (Auto)' : dropdown.value}`, 'info');
+            }
+            loadSavedSettingsUI();
+        }
+
+        function saveCustomModelId() {
+            const val = document.getElementById('customModelIdInput').value.trim();
+            if (val) {
+                localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, val);
+                localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, val);
+                loadSavedSettingsUI();
+            }
+        }
+
+        function loadSavedSettingsUI() {
+            const keys = getSavedApiKeys();
+            const activeObj = getActiveApiKeyObj();
+            const listContainer = document.getElementById('savedKeysListContainer');
+            const countBadge = document.getElementById('savedKeysCountBadge');
+            const headerBtn = document.getElementById('headerKeyStatusBtn');
+            const headerDot = document.getElementById('headerKeyDot');
+            const headerText = document.getElementById('headerKeyText');
+            const resolvedBadge = document.getElementById('resolvedActiveModelBadge');
+            const noKeyBanner = document.getElementById('noKeyWarningBanner');
+
+            countBadge.textContent = `${keys.length} key`;
+
+            const modelSetting = getSelectedModelSetting();
+            const activeModelId = getInitialModelToTry();
+
+            if (resolvedBadge) {
+                resolvedBadge.textContent = modelSetting === 'auto'
+                    ? `${activeModelId} (Tự động)`
+                    : activeModelId;
+            }
+
+            // Update Top Header Status Badge & Banner
+            if (activeObj) {
+                headerBtn.className = 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 transition';
+                headerDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+                headerText.textContent = activeObj.label;
+                noKeyBanner.classList.add('hidden');
+            } else {
+                headerBtn.className = 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/40 transition';
+                headerDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+                headerText.textContent = 'Chưa có Key';
+                noKeyBanner.classList.remove('hidden');
+            }
+
+            // Render Saved Keys List
+            if (keys.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="bg-workbench-950 border border-slate-800/80 rounded-xl p-4 text-center text-xs text-slate-400">
+                        Chưa có API Key nào được lưu. Hãy bấm <b>"Lấy Key Free"</b> ở góc trên để tạo mã từ Google AI Studio.
+                    </div>
+                `;
+            } else {
+                listContainer.innerHTML = keys.map(item => {
+                    const isActive = activeObj && activeObj.id === item.id;
+                    const maskedKey = item.key.slice(0, 8) + '••••••••••••' + item.key.slice(-4);
+                    return `
+                        <div class="flex items-center justify-between gap-2 p-3 rounded-xl border ${isActive ? 'bg-emerald-950/25 border-emerald-500/50' : 'bg-workbench-950 border-slate-800'}">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1" onclick="selectActiveApiKey('${item.id}')" role="button">
+                                <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${isActive ? 'border-emerald-400 bg-emerald-500 text-slate-950' : 'border-slate-600'}">
+                                    ${isActive ? '<i class="fa-solid fa-check text-[10px]"></i>' : ''}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-bold text-xs text-white truncate">${escapeHtml(item.label)}</span>
+                                        ${isActive ? '<span class="text-[10px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded font-semibold">Đang dùng</span>' : ''}
+                                    </div>
+                                    <p class="font-mono text-[11px] text-slate-400 truncate mt-0.5">${maskedKey}</p>
+                                </div>
+                            </div>
+                            <button onclick="deleteApiKey('${item.id}')" title="Xoá Key này" class="p-2 rounded-lg bg-rose-950/50 hover:bg-rose-900/70 text-rose-300 border border-rose-800/50 text-xs shrink-0 active:scale-95 transition">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Sync Model Dropdown
+            const dropdown = document.getElementById('modelSelectDropdown');
+            const availableOptionValues = Array.from(dropdown.options).map(o => o.value);
+            if (availableOptionValues.includes(modelSetting)) {
+                dropdown.value = modelSetting;
+                document.getElementById('customModelInputWrapper').classList.add('hidden');
+            } else {
+                dropdown.value = 'custom';
+                document.getElementById('customModelInputWrapper').classList.remove('hidden');
+                document.getElementById('customModelIdInput').value = modelSetting;
+            }
+        }
+
+        // Test Active API Key Connectivity with Smart Auto-Fallback
+        async function testActiveApiKey() {
+            const activeObj = getActiveApiKeyObj();
+            if (!activeObj) {
+                showToast('Chưa có API Key nào để kiểm tra!', 'warning');
+                return;
+            }
+            const btn = document.getElementById('testKeyBtn');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang dò & thử Key...`;
+
+            try {
+                const { usedModel } = await callGeminiWithAutoFallback(
+                    activeObj.key,
+                    { contents: [{ parts: [{ text: 'Trả lời ngắn gọn: OK' }] }] }
+                );
+                showToast(`Kết nối thành công với "${activeObj.label}" qua model: ${usedModel}!`, 'success');
+            } catch (err) {
+                showToast(`Lỗi API: ${err.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        /********************************************************************
+         * 6. IMAGE CAPTURE, CLIENT-SIDE COMPRESSION & PREVIEW
+         ********************************************************************/
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const originalSizeKB = Math.round(file.size / 1024);
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Resize to max 1280px for fast upload & low token/bandwidth usage
+                    const MAX_DIM = 1280;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height && width > MAX_DIM) {
+                        height = Math.round((height * MAX_DIM) / width);
+                        width = MAX_DIM;
+                    } else if (height > MAX_DIM) {
+                        width = Math.round((width * MAX_DIM) / height);
+                        height = MAX_DIM;
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Export compressed JPEG (0.82 quality)
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                    currentCompressedBase64 = compressedDataUrl.split(',')[1];
+
+                    // Create a tiny thumbnail (240px) for localStorage history
+                    const thumbCanvas = document.createElement('canvas');
+                    const thumbScale = 240 / Math.max(width, height);
+                    thumbCanvas.width = Math.round(width * thumbScale);
+                    thumbCanvas.height = Math.round(height * thumbScale);
+                    thumbCanvas.getContext('2d').drawImage(img, 0, 0, thumbCanvas.width, thumbCanvas.height);
+                    currentThumbnailDataUrl = thumbCanvas.toDataURL('image/jpeg', 0.65);
+
+                    const compressedSizeKB = Math.round((currentCompressedBase64.length * 3) / 4 / 1024);
+
+                    // Update UI Preview
+                    document.getElementById('previewImage').src = compressedDataUrl;
+                    document.getElementById('compressionBadge').textContent = `Đã nén: ${originalSizeKB}KB → ${compressedSizeKB}KB`;
+                    document.getElementById('captureButtonsContainer').classList.add('hidden');
+                    document.getElementById('imagePreviewWrapper').classList.remove('hidden');
+                    showToast('Đã nạp ảnh! Bấm "Phân Tích Tên Máy" để bắt đầu.', 'info');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearSelectedImage() {
+            currentCompressedBase64 = null;
+            currentThumbnailDataUrl = null;
+            document.getElementById('cameraInput').value = '';
+            document.getElementById('galleryInput').value = '';
+            document.getElementById('previewImage').src = '';
+            document.getElementById('imagePreviewWrapper').classList.add('hidden');
+            document.getElementById('captureButtonsContainer').classList.remove('hidden');
+        }
+
+        /********************************************************************
+         * 7. GEMINI VISION API CALL FOR REPAIR ANALYSIS (WITH AUTO-FALLBACK)
+         ********************************************************************/
+        async function analyzePhoneImage() {
+            if (!currentCompressedBase64) {
+                showToast('Vui lòng chụp ảnh hoặc chọn ảnh điện thoại trước!', 'warning');
+                return;
+            }
+
+            const activeKeyObj = getActiveApiKeyObj();
+            if (!activeKeyObj) {
+                showToast('Bạn chưa thêm Gemini API Key! Hãy thêm Key để phân tích ảnh.', 'warning');
+                switchTab('settings');
+                return;
+            }
+
+            const userNotes = document.getElementById('techNotesInput').value.trim();
+
+            // Show Scanning UI State
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const loadingCard = document.getElementById('loadingStatusCard');
+            const loadingTitle = document.getElementById('loadingStepTitle');
+            const laserOverlay = document.getElementById('scanLaserOverlay');
+
+            analyzeBtn.disabled = true;
+            loadingCard.classList.remove('hidden');
+            laserOverlay.classList.remove('hidden');
+
+            const systemPrompt = `Bạn là một Kỹ thuật viên & Giảng viên dạy sửa chữa phần cứng điện thoại di động bậc thầy tại Việt Nam.
+Hãy phân tích hình ảnh chiếc điện thoại này (có thể là mặt lưng, cụm camera, màn hình, khung sườn hoặc mainboard bên trong) kết hợp với ghi chú của học viên: "${userNotes || 'Không có ghi chú thêm'}".
+
+Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không bọc trong markdown code block) theo đúng cấu trúc sau bằng tiếng Việt:
 {
-  "deviceName": "Tên thương mại đầy đủ chính xác nhất (VD: Xiaomi Redmi Note 8 / Samsung Galaxy A20)",
-  "brand": "Hãng sản xuất",
-  "releaseYear": "Năm ra mắt",
-  "modelCodes": ["Danh sách mã Model phần cứng chuẩn trên vỏ/main, VD: M1908C3JG, SM-A205F/DS"],
-  "confidence": 95,
-  "visualReasoning": "Giải thích chi tiết các đặc điểm nhận dạng trên máy (vị trí đèn flash, cụm cam, vân tay, chữ in) để chứng minh kết luận",
-  "entryMethod": "Tách nắp lưng sau (Back Glass/Plastic) | Tách màn hình từ mặt trước (Front Screen) | Tháo ốc đít mở màn hình",
-  "heatPlateTemp": "Nhiệt độ bàn nhiệt chuẩn (VD: 75°C - 85°C trong 3 phút)",
-  "flexCableWarning": "CẢNH BÁO ĐỨT CÁP QUAN TRỌNG NHẤT khi cạy nắp lưng hoặc nhấc màn hình (nêu rõ vị trí cáp vân tay, cáp nối main-sub, cáp màn hình nằm ở hướng nào)",
-  "batteryModelCode": "Mã Pin chuẩn để đặt linh kiện (VD: BN46, EB-BA205ABU, BLP...)",
-  "displayTypeAndFlex": "Loại màn hình (Super AMOLED / IPS LCD) & lưu ý cổ cáp màn hình, có dùng chung màn với mã máy nào khác không",
-  "specs": {
-    "chipset": "Tên chip xử lý (SoC)",
-    "batteryCapacity": "Dung lượng pin + công suất sạc",
-    "chargingPort": "Chuẩn chân sạc (Type-C / Micro-USB / Lightning)",
-    "backMaterial": "Chất liệu nắp lưng (Kính Gorilla / Nhựa Glasstic / Nhôm)"
+  "modelName": "Tên thương mại chính xác nhất của máy (VD: Xiaomi Redmi Note 8 hoặc Samsung Galaxy S22 Ultra 5G)",
+  "confidence": "Cao / Trung bình / Thấp",
+  "confidenceReason": "Giải thích ngắn gọn các đặc điểm nhận dạng trên ảnh (logo Redmi/Samsung, vị trí cảm biến vân tay, cụm camera, khung viền...)",
+  "modelCodes": "Các mã model phần cứng phổ biến của dòng này (VD: M1908C3JG, SM-S908B...)",
+  "repairGuide": {
+    "entryMethod": "Hướng tháo mở máy chuẩn kỹ thuật (VD: Khò nhiệt tách Nắp Lưng sau HOẶC Tách từ Màn Hình trước)",
+    "heatTemp": "Nhiệt độ bàn nhiệt & thời gian khuyến nghị + dung dịch hỗ trợ (VD: 80°C - 90°C trong 2-3 phút, lưu ý màn IPS LCD tránh nhỏ cồn vào phản quang)",
+    "flexCableWarnings": "CẢNH BÁO CỰC KỲ QUAN TRỌNG về vị trí cáp vân tay mặt lưng, cáp màn hình, cáp phím âm lượng/nguồn hoặc cáp nối main-sub dễ bị đứt khi lách mở máy",
+    "disassemblySteps": [
+      "Bước 1: Tháo khay SIM đầu tiên và tắt nguồn hoàn toàn.",
+      "Bước 2: Gia nhiệt nắp lưng/màn hình ở nhiệt độ phù hợp...",
+      "Bước 3: Lưu ý nhấc nhẹ nắp lưng để tháo lồng sắt bảo vệ socket cáp vân tay trước khi nhấc hẳn nắp lưng ra.",
+      "Bước 4: Tháo ốc lồng main, cách ly socket Pin đầu tiên trước khi tháo cáp màn hình và camera."
+    ],
+    "commonIssues": "Các pan bệnh phần cứng hay gặp trên dòng máy này (VD: liệt cảm ứng, mất đèn màn hình, lỗi IC sóng/wifi, phù pin...)"
   },
-  "stepByStepTeardown": [
-    "Bước 1: Tháo khay SIM đầu tiên và kiểm tra...",
-    "Bước 2: Gia nhiệt bàn nhiệt ở mức...",
-    "Bước 3: Đưa lá nhựa mỏng vào cạnh dưới, lưu ý né cáp...",
-    "Bước 4: Tháo lồng sắt bảo vệ và cách ly socket Pin trước tiên..."
-  ],
+  "specs": {
+    "display": "Loại tấm nền (IPS LCD có phản quang hay AMOLED/OLED), kích thước, độ phân giải, màn phẳng hay cong",
+    "battery": "Dung lượng pin (mAh), mã pin (VD: BN46, EB-BS908ABY), công suất sạc, loại chân sạc (Type-C hay Micro-USB)",
+    "hardware": "Vi xử lý (Chipset), RAM/ROM, cấu trúc mainboard, chất liệu mặt lưng & khung viền"
+  },
   "similarModels": [
     {
-      "name": "Tên dòng máy ngoại hình giống dễ nhầm 1",
-      "difference": "Điểm khác biệt cốt lõi ở cụm cam/vân tay/kích thước để phân biệt"
-    },
-    {
-      "name": "Tên dòng máy ngoại hình giống dễ nhầm 2",
-      "difference": "Điểm khác biệt cốt lõi"
+      "name": "Tên dòng máy có ngoại hình gần giống dễ nhầm linh kiện",
+      "difference": "Cách phân biệt nhanh bằng mắt thường hoặc kích thước màn/vị trí vân tay/camera"
     }
-  ],
-  "youtubeQuery": "Từ khóa tiếng Anh/Việt chuẩn nhất để tìm video tháo máy (VD: Redmi Note 8 teardown disassembly replacement)"
+  ]
 }`;
-    }
 
-    // 1. PHÂN TÍCH TỪ ẢNH CHỤP
-    async function analyzeImageWithAI() {
-      hideError();
-      const hint = (document.getElementById('imageHintInput').value || '').trim();
-      const manualTop = (document.getElementById('manualPhoneInput').value || '').trim();
+            try {
+                const payload = {
+                    contents: [{
+                        parts: [
+                            { text: systemPrompt },
+                            {
+                                inline_data: {
+                                    mime_type: 'image/jpeg',
+                                    data: currentCompressedBase64
+                                }
+                            }
+                        ]
+                    }],
+                    generationConfig: {
+                        temperature: 0.2,
+                        responseMimeType: 'application/json'
+                    }
+                };
 
-      // Nếu người dùng chưa chọn ảnh nhưng đã gõ tên máy ở ô trên cùng thì chuyển sang tra bằng tên máy
-      if (!state.currentImageBase64) {
-        if (manualTop) {
-          return analyzeByManualName();
-        }
-        showError('Vui lòng chụp/tải ảnh điện thoại lên, hoặc nhập tên máy vào ô "Tra Cứu Bằng Tên Máy" ở phía trên.');
-        return;
-      }
+                const { data: result, usedModel } = await callGeminiWithAutoFallback(
+                    activeKeyObj.key,
+                    payload,
+                    (tryingModel) => {
+                        loadingTitle.textContent = `Đang phân tích ảnh qua AI (${tryingModel})...`;
+                    }
+                );
 
-      setLoadingState(true, 'Đang giám định ảnh độ phân giải cao (Forensic HD)...', 'Đối chiếu cụm camera, đèn flash, vị trí vân tay & mã linh kiện GSMArena');
+                const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                const parsedData = parseGeminiJsonSafely(rawText);
 
-      try {
-        const prompt = buildHardwareSystemPrompt(hint, null);
-        const contents = [{
-          role: 'user',
-          parts: [
-            { text: prompt },
-            {
-              inlineData: {
-                mimeType: state.currentImageMime,
-                data: state.currentImageBase64
-              }
+                if (!parsedData || !parsedData.modelName) {
+                    throw new Error('Không thể đọc cấu trúc dữ liệu từ AI. Vui lòng thử chụp rõ nét hơn.');
+                }
+
+                // Render Analysis & Save to Local History
+                currentAnalysisData = parsedData;
+                renderAnalysisResult(parsedData);
+                saveScanToHistory(parsedData, currentThumbnailDataUrl);
+                showToast(`Đã nhận diện: ${parsedData.modelName} (${usedModel})`, 'success');
+
+            } catch (error) {
+                showToast(`Lỗi phân tích: ${error.message}`, 'error');
+            } finally {
+                analyzeBtn.disabled = false;
+                loadingCard.classList.add('hidden');
+                laserOverlay.classList.add('hidden');
             }
-          ]
-        }];
+        }
 
-        const rawResponse = await callGeminiSmart(contents, true);
-        const parsed = parseGeminiJsonSafe(rawResponse);
-        handleAnalysisSuccess(parsed);
-      } catch (err) {
-        showError('Lỗi phân tích: ' + err.message);
-      } finally {
-        setLoadingState(false);
-      }
-    }
+        // Safely parse JSON even if model wraps it in ```json ... ```
+        function parseGeminiJsonSafely(text) {
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+                try {
+                    return JSON.parse(cleaned);
+                } catch (err2) {
+                    // Attempt to extract first {...} block
+                    const match = cleaned.match(/\{[\s\S]*\}/);
+                    if (match) {
+                        try { return JSON.parse(match[0]); } catch (e3) { return null; }
+                    }
+                    return null;
+                }
+            }
+        }
 
-    // 2. PHÂN TÍCH TRỰC TIẾP BẰNG TÊN MÁY / MÃ MODEL (DỰ PHÒNG HOẶC TRA NHANH)
-    async function analyzeByManualName(customName) {
-      hideError();
-      const inputEl = document.getElementById('manualPhoneInput');
-      const queryName = (customName || (inputEl ? inputEl.value : '') || '').trim();
+        /********************************************************************
+         * 8. RENDER ANALYSIS RESULTS & MULTI-PLATFORM VIDEO LINKS
+         ********************************************************************/
+        function renderAnalysisResult(data) {
+            const container = document.getElementById('analysisResultContainer');
+            container.classList.remove('hidden');
 
-      if (!queryName) {
-        showError('Vui lòng nhập tên điện thoại hoặc mã Model (VD: Redmi Note 8, Samsung A20, SM-A205F).');
-        return;
-      }
+            // 1. Header & Confidence
+            document.getElementById('resModelName').textContent = data.modelName || 'Chưa rõ tên máy';
+            document.getElementById('resModelCodes').textContent = data.modelCodes || 'Đang cập nhật';
+            document.getElementById('resConfidenceReason').textContent = data.confidenceReason || '';
 
-      if (inputEl && customName) {
-        inputEl.value = customName;
-      }
+            const confBadge = document.getElementById('resConfidenceBadge');
+            const conf = (data.confidence || 'Cao').toLowerCase();
+            if (conf.includes('cao')) {
+                confBadge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+                confBadge.textContent = `Độ chính xác: ${data.confidence}`;
+            } else if (conf.includes('trung')) {
+                confBadge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                confBadge.textContent = `Độ chính xác: ${data.confidence}`;
+            } else {
+                confBadge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40';
+                confBadge.textContent = `Độ chính xác: ${data.confidence}`;
+            }
 
-      setLoadingState(true, `Đang truy xuất hồ sơ kỹ thuật của "${queryName}"...`, 'Đối chiếu mã Pin chuẩn, sơ đồ cáp & quy trình tháo lắp từ GSMArena / iFixit');
+            // 2. Disassembly & Warnings
+            const guide = data.repairGuide || {};
+            document.getElementById('resEntryMethod').textContent = guide.entryMethod || 'Kiểm tra kỹ video teardown trước khi khò nhiệt';
+            document.getElementById('resHeatTemp').textContent = guide.heatTemp || '80°C - 85°C trong 2-3 phút';
+            document.getElementById('resFlexWarnings').textContent = guide.flexCableWarnings || 'Chú ý cáp vân tay và cáp màn hình khi lách mở.';
+            document.getElementById('resCommonIssues').textContent = guide.commonIssues || 'Chưa có ghi nhận đặc biệt.';
 
-      try {
-        const prompt = buildHardwareSystemPrompt('', queryName);
-        const contents = [{
-          role: 'user',
-          parts: [{ text: prompt }]
-        }];
+            // Step-by-Step Disassembly Checklist
+            const stepsContainer = document.getElementById('resDisassemblySteps');
+            const steps = Array.isArray(guide.disassemblySteps) && guide.disassemblySteps.length > 0
+                ? guide.disassemblySteps
+                : [
+                    'Tháo khay SIM và tắt nguồn máy hoàn toàn trước khi tháo.',
+                    'Gia nhiệt đều phần viền theo nhiệt độ khuyến nghị, dùng miếng lách mỏng cẩn thận tránh vị trí cáp.',
+                    'Cách ly socket Pin đầu tiên ngay khi mở được lồng bảo vệ mainboard.'
+                ];
+            stepsContainer.innerHTML = steps.map(s => `<li class="pl-1">${escapeHtml(s.replace(/^Bước\s*\d+\s*:\s*/i, ''))}</li>`).join('');
 
-        const rawResponse = await callGeminiSmart(contents, true);
-        const parsed = parseGeminiJsonSafe(rawResponse);
-        handleAnalysisSuccess(parsed);
-      } catch (err) {
-        showError('Lỗi tra cứu tên máy: ' + err.message);
-      } finally {
-        setLoadingState(false);
-      }
-    }
+            // 3. Hardware Specs
+            const specs = data.specs || {};
+            document.getElementById('resSpecDisplay').textContent = specs.display || 'Đang cập nhật';
+            document.getElementById('resSpecBattery').textContent = specs.battery || 'Đang cập nhật';
+            document.getElementById('resSpecHardware').textContent = specs.hardware || 'Đang cập nhật';
 
-    function parseGeminiJsonSafe(rawText) {
-      let cleaned = String(rawText || '').trim();
-      cleaned = cleaned.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
-      const firstBrace = cleaned.indexOf('{');
-      const lastBrace = cleaned.lastIndexOf('}');
-      if (firstBrace !== -1 && lastBrace !== -1) {
-        cleaned = cleaned.substring(firstBrace, lastBrace + 1);
-      }
-      return JSON.parse(cleaned);
-    }
+            // 4. Similar Models
+            const simContainer = document.getElementById('resSimilarModelsList');
+            const simList = Array.isArray(data.similarModels) ? data.similarModels : [];
+            if (simList.length === 0) {
+                simContainer.innerHTML = `<p class="text-slate-400">Không có dòng máy nào có thiết kế trùng lặp đáng kể.</p>`;
+            } else {
+                simContainer.innerHTML = simList.map(item => `
+                    <div class="bg-workbench-950 border border-slate-800/90 rounded-xl p-2.5">
+                        <span class="font-bold text-amber-300">${escapeHtml(item.name || '')}:</span>
+                        <span class="text-slate-300 ml-1">${escapeHtml(item.difference || '')}</span>
+                    </div>
+                `).join('');
+            }
 
-    function setLoadingState(isLoading, title, sub) {
-      const box = document.getElementById('loadingBox');
-      const btnImg = document.getElementById('btnAnalyzeImage');
-      const btnMan = document.getElementById('btnManualSearch');
-      if (isLoading) {
-        document.getElementById('loadingTitle').textContent = title || 'Đang phân tích...';
-        document.getElementById('loadingSub').textContent = sub || '';
-        box.classList.remove('hidden');
-        if (btnImg) btnImg.disabled = true;
-        if (btnMan) btnMan.disabled = true;
-      } else {
-        box.classList.add('hidden');
-        if (btnImg) btnImg.disabled = false;
-        if (btnMan) btnMan.disabled = false;
-      }
-    }
+            // 5. Render Platform Deep Links
+            renderPlatformLinksInto(data.modelName, 'resVideoLinksGrid');
 
-    function handleAnalysisSuccess(deviceData) {
-      state.currentDeviceData = deviceData;
-      state.chatMessages = [];
+            // Reset Follow-up Chat Box for this phone
+            document.getElementById('followUpChatBox').innerHTML = `
+                <div class="bg-workbench-950 border border-slate-800 rounded-xl p-3 text-slate-300">
+                    Đang chọn máy: <b class="text-emerald-400">${escapeHtml(data.modelName)}</b>. Bạn có thể hỏi thêm về linh kiện dùng chung, vị trí IC hoặc cách xử lý pan bệnh của máy này.
+                </div>
+            `;
 
-      // Lưu vào lịch sử
-      const historyItem = {
-        id: 'his_' + Date.now(),
-        timestamp: new Date().toLocaleString('vi-VN'),
-        data: deviceData
-      };
-      state.history.unshift(historyItem);
-      if (state.history.length > 30) state.history.pop();
-      saveStateToStorage();
-      renderHistoryList();
+            // Scroll smoothly to result card
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 150);
+        }
 
-      renderDeviceResult(deviceData);
-    }
+        // Helper to generate 1-click search buttons for YouTube, TikTok, Bilibili, iFixit, Schematics
+        function renderPlatformLinksInto(modelName, containerId) {
+            const container = document.getElementById(containerId);
+            const cleanName = (modelName || 'Smartphone').trim();
 
-    // HIỂN THỊ TOÀN BỘ KẾT QUẢ PHÂN TÍCH + Ô ĐỔI TÊN MÁY + NGUỒN ĐỐI CHIẾU + KHUNG CHAT
-    function renderDeviceResult(d) {
-      const container = document.getElementById('resultContainer');
-      if (!container || !d) return;
+            const links = [
+                {
+                    title: 'YouTube: Tháo Lắp (Teardown)',
+                    subtitle: 'Xem quy trình mở máy & vị trí cáp',
+                    icon: 'fa-brands fa-youtube text-red-500',
+                    border: 'border-red-500/30 hover:border-red-500/70 bg-red-950/15',
+                    url: `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanName + ' teardown disassembly')}`
+                },
+                {
+                    title: 'YouTube: Thay Màn / Ép Kính',
+                    subtitle: 'Hướng dẫn tách màn, ép kính, cổ cáp',
+                    icon: 'fa-solid fa-mobile-screen-button text-rose-400',
+                    border: 'border-rose-500/30 hover:border-rose-500/70 bg-rose-950/15',
+                    url: `https://www.youtube.com/results?search_query=${encodeURIComponent('thay màn hình ép kính ' + cleanName)}`
+                },
+                {
+                    title: 'YouTube: Thay Pin & Chân Sạc',
+                    subtitle: 'Cách tách pin keo zin & thay cụm sạc',
+                    icon: 'fa-solid fa-battery-half text-emerald-400',
+                    border: 'border-emerald-500/30 hover:border-emerald-500/70 bg-emerald-950/15',
+                    url: `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanName + ' battery charging port replacement')}`
+                },
+                {
+                    title: 'Sơ Đồ Mạch (Schematic / Boardview)',
+                    subtitle: 'Tìm PDF sơ đồ mạch, vị trí IC, đường áp',
+                    icon: 'fa-solid fa-diagram-project text-cyan-400',
+                    border: 'border-cyan-500/30 hover:border-cyan-500/70 bg-cyan-950/15',
+                    url: `https://www.google.com/search?q=${encodeURIComponent(cleanName + ' schematic diagram boardview service manual pdf')}`
+                },
+                {
+                    title: 'TikTok: Video Thợ Sửa Thực Tế',
+                    subtitle: 'Mẹo tháo nhanh & pan bệnh thực chiến',
+                    icon: 'fa-brands fa-tiktok text-pink-400',
+                    border: 'border-pink-500/30 hover:border-pink-500/70 bg-pink-950/15',
+                    url: `https://www.tiktok.com/search?q=${encodeURIComponent('sửa ' + cleanName)}`
+                },
+                {
+                    title: 'Bilibili: Pháp Sư Trung Hoa Sửa Main',
+                    subtitle: 'Video tháo máy & đóng CPU/IC chuyên sâu',
+                    icon: 'fa-solid fa-tv text-sky-400',
+                    border: 'border-sky-500/30 hover:border-sky-500/70 bg-sky-950/15',
+                    url: `https://search.bilibili.com/all?keyword=${encodeURIComponent(cleanName + ' 拆机 维修')}`
+                },
+                {
+                    title: 'iFixit & Cẩm Nang Tháo Mở',
+                    subtitle: 'Hướng dẫn từng bước bằng hình ảnh',
+                    icon: 'fa-solid fa-screwdriver-wrench text-amber-400',
+                    border: 'border-amber-500/30 hover:border-amber-500/70 bg-amber-950/15',
+                    url: `https://www.google.com/search?q=${encodeURIComponent('site:ifixit.com ' + cleanName + ' teardown repair')}`
+                },
+                {
+                    title: 'Tra Giá Linh Kiện (Màn / Pin / Vỏ)',
+                    subtitle: 'Tham khảo giá linh kiện thay thế tại VN',
+                    icon: 'fa-solid fa-tags text-purple-400',
+                    border: 'border-purple-500/30 hover:border-purple-500/70 bg-purple-950/15',
+                    url: `https://www.google.com/search?q=${encodeURIComponent('màn hình pin linh kiện ' + cleanName)}`
+                }
+            ];
 
-      const deviceName = d.deviceName || 'Thiết bị chưa rõ tên';
-      const modelCodes = Array.isArray(d.modelCodes) && d.modelCodes.length ? d.modelCodes.join(' • ') : 'Đang cập nhật';
-      const confidence = Number(d.confidence) || 90;
-      const ytQuery = encodeURIComponent(d.youtubeQuery || (deviceName + ' teardown disassembly'));
-      const screenQuery = encodeURIComponent(deviceName + ' screen replacement ép kính thay màn');
-      const batteryQuery = encodeURIComponent(deviceName + ' battery replacement thay pin');
-      const schematicQuery = encodeURIComponent(deviceName + ' schematic boardview pdf');
-      const gsmQuery = encodeURIComponent(deviceName);
+            container.innerHTML = links.map(item => `
+                <a href="${item.url}" target="_blank" rel="noopener noreferrer" 
+                    class="flex items-center justify-between gap-2.5 p-3 rounded-xl border transition active:scale-[0.98] ${item.border}">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-9 h-9 rounded-xl bg-workbench-950/90 flex items-center justify-center shrink-0 border border-slate-800">
+                            <i class="${item.icon} text-base"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <span class="block font-bold text-xs text-white truncate">${item.title}</span>
+                            <span class="block text-[11px] text-slate-400 truncate mt-0.5">${item.subtitle}</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-500 text-xs shrink-0"></i>
+                </a>
+            `).join('');
+        }
 
-      const similarList = Array.isArray(d.similarModels) ? d.similarModels : [];
-      const stepsList = Array.isArray(d.stepByStepTeardown) ? d.stepByStepTeardown : [];
-      const specs = d.specs || {};
+        function copyModelName() {
+            const name = document.getElementById('resModelName').textContent.trim();
+            const tempInput = document.createElement('textarea');
+            tempInput.value = name;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast(`Đã sao chép: ${name}`, 'success');
+        }
 
-      container.innerHTML = `
-        <!-- 1. THẺ TÊN MÁY & ĐỐI CHIẾU NHANH -->
-        <div class="bg-[#111827] border border-emerald-500/40 rounded-2xl p-4 shadow-xl space-y-3.5">
-          <div class="flex items-start justify-between gap-2">
-            <div>
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  ${escapeHtml(d.brand || 'Smartphone')} • ${escapeHtml(d.releaseYear || '')}
-                </span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">
-                  Độ khớp: ${confidence}%
-                </span>
-              </div>
-              <h2 class="text-lg font-extrabold text-white mt-1.5 leading-snug">${escapeHtml(deviceName)}</h2>
-              <div class="text-xs font-mono-code text-emerald-400 mt-0.5">Mã phần cứng: ${escapeHtml(modelCodes)}</div>
-            </div>
-          </div>
+        /********************************************************************
+         * 9. FOLLOW-UP REPAIR Q&A WITH GEMINI (WITH AUTO-FALLBACK)
+         ********************************************************************/
+        function setQuickQuestion(qText) {
+            document.getElementById('followUpInput').value = qText;
+            askFollowUpQuestion();
+        }
 
-          <!-- Căn cứ nhận diện ngoại hình -->
-          <div class="p-3 rounded-xl bg-slate-950/90 border border-slate-800 text-xs text-slate-300 leading-relaxed">
-            <span class="text-emerald-400 font-bold"><i class="fa-solid fa-eye mr-1"></i>Căn cứ giám định:</span>
-            ${escapeHtml(d.visualReasoning || 'Dựa trên thông số chuẩn của dòng máy.')}
-          </div>
+        async function askFollowUpQuestion() {
+            const input = document.getElementById('followUpInput');
+            const question = input.value.trim();
+            if (!question) return;
 
-          <!-- HỘP ĐỔI NHANH NẾU QUÉT ẢNH NHẦM TÊN MÁY -->
-          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-700/80 space-y-2">
-            <div class="text-[11px] font-bold text-amber-300 flex items-center gap-1.5">
-              <i class="fa-solid fa-arrows-rotate"></i>
-              Quét sai tên máy? Chọn nhanh máy giống hoặc nhập lại tên đúng:
-            </div>
-            ${similarList.length > 0 ? `
-              <div class="flex flex-wrap gap-1.5">
-                ${similarList.map(function(sim) {
-                  const safeName = escapeHtml(sim.name || '').replace(/'/g, "\\'");
-                  return `<button onclick="analyzeByManualName('${safeName}')" class="text-[11px] font-semibold bg-slate-950 hover:bg-emerald-950 text-slate-200 hover:text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">
-                    Đổi sang: ${escapeHtml(sim.name)}
-                  </button>`;
-                }).join('')}
-              </div>
-            ` : ''}
-            <div class="flex gap-2 pt-0.5">
-              <input
-                type="text"
-                id="overrideNameInput"
-                placeholder="Nhập tên máy đúng (VD: Redmi Note 8 Pro)..."
-                class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-500 outline-none"
-                onkeydown="if(event.key==='Enter') analyzeByManualName(this.value)"
-              />
-              <button onclick="analyzeByManualName(document.getElementById('overrideNameInput').value)" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-3 py-1.5 rounded-lg shrink-0">
-                Tra Lại
-              </button>
-            </div>
-          </div>
-        </div>
+            const activeKeyObj = getActiveApiKeyObj();
+            if (!activeKeyObj) {
+                showToast('Vui lòng thêm Gemini API Key trong mục Cài đặt để hỏi AI!', 'warning');
+                return;
+            }
 
-        <!-- 2. CẢNH BÁO THÁO LẮP, NHIỆT ĐỘ & CÁP NGẦM -->
-        <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 space-y-3">
-          <h3 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
-            Cảnh Báo Tháo Lắp & Nhiệt Độ An Toàn
-          </h3>
+            const chatBox = document.getElementById('followUpChatBox');
+            const sendBtn = document.getElementById('followUpSendBtn');
+            const modelName = currentAnalysisData?.modelName || 'Điện thoại đang kiểm tra';
 
-          <div class="grid grid-cols-2 gap-2.5 text-xs">
-            <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div class="text-[10px] uppercase font-bold text-slate-400">Hướng Mở Máy</div>
-              <div class="font-bold text-emerald-400 mt-1 leading-snug">${escapeHtml(d.entryMethod || 'Tách nắp lưng sau')}</div>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div class="text-[10px] uppercase font-bold text-slate-400">Nhiệt Độ Bàn Nhiệt</div>
-              <div class="font-bold text-amber-400 mt-1 leading-snug">${escapeHtml(d.heatPlateTemp || '75°C - 85°C (3-4 phút)')}</div>
-            </div>
-          </div>
+            // Append User Question
+            chatBox.innerHTML += `
+                <div class="bg-emerald-500/15 border border-emerald-500/30 rounded-xl p-2.5 text-emerald-200 ml-6">
+                    <span class="font-bold block text-[10px] uppercase text-emerald-400 mb-0.5">Học viên hỏi:</span>
+                    ${escapeHtml(question)}
+                </div>
+            `;
+            input.value = '';
+            sendBtn.disabled = true;
+            chatBox.scrollTop = chatBox.scrollHeight;
 
-          <div class="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-100 leading-relaxed">
-            <div class="font-extrabold text-rose-400 uppercase text-[11px] mb-1 flex items-center gap-1.5">
-              <i class="fa-solid fa-bolt"></i> Cảnh Báo Đứt Cáp Ngầm Quan Trọng:
-            </div>
-            ${escapeHtml(d.flexCableWarning || 'Cẩn thận cáp vân tay và cáp nối cụm sạc dưới khi đưa lá nhựa sâu quá 3mm.')}
-          </div>
+            // Loading bubble
+            const loadingId = 'msg_' + Date.now();
+            chatBox.innerHTML += `
+                <div id="${loadingId}" class="bg-workbench-950 border border-slate-800 rounded-xl p-2.5 text-slate-400 mr-6">
+                    <i class="fa-solid fa-spinner fa-spin text-emerald-400 mr-1.5"></i> Sư phụ AI đang trả lời...
+                </div>
+            `;
+            chatBox.scrollTop = chatBox.scrollHeight;
 
-          ${stepsList.length > 0 ? `
-            <div class="space-y-1.5 pt-1">
-              <div class="text-xs font-bold text-slate-200">Quy trình tháo máy từng bước chuẩn:</div>
-              <div class="space-y-1.5">
-                ${stepsList.map(function(step) {
-                  return `<div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800/90 text-xs text-slate-200 leading-relaxed">${escapeHtml(step)}</div>`;
-                }).join('')}
-              </div>
-            </div>
-          ` : ''}
-        </div>
+            try {
+                const prompt = `Bạn là giảng viên dạy sửa chữa điện thoại di động thực chiến. Học viên đang tháo/sửa máy "${modelName}" (Mã: ${currentAnalysisData?.modelCodes || ''}) và hỏi: "${question}". Hãy trả lời ngắn gọn, súc tích, chia từng mục rõ ràng, đi thẳng vào kỹ thuật thực tế (nhiệt độ, vị trí cáp/IC, kinh nghiệm tránh rủi ro đền máy) bằng tiếng Việt dễ hiểu.`;
 
-        <!-- 3. KIỂM CHỨNG NGUỒN TIN CẬY & MÃ LINH KIỆN CHUẨN -->
-        <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-circle-check text-emerald-400"></i>
-              Kiểm Chứng Nguồn & Mã Linh Kiện
-            </h3>
-            <span class="text-[10px] text-slate-400">Đối chiếu chéo 1-chạm</span>
-          </div>
+                const { data } = await callGeminiWithAutoFallback(
+                    activeKeyObj.key,
+                    { contents: [{ parts: [{ text: prompt }] }] }
+                );
+                const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Không nhận được phản hồi.';
 
-          <div class="grid grid-cols-2 gap-2.5 text-xs">
-            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
-              <div class="text-[10px] text-slate-400">Mã Pin Chuẩn (Battery Code)</div>
-              <div class="font-mono-code font-bold text-emerald-400 mt-0.5">${escapeHtml(d.batteryModelCode || 'Tra trên thân pin')}</div>
-            </div>
-            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
-              <div class="text-[10px] text-slate-400">Chân Sạc & Vỏ Lưng</div>
-              <div class="font-bold text-slate-200 mt-0.5">${escapeHtml(specs.chargingPort || 'Type-C')} • ${escapeHtml(specs.backMaterial || '')}</div>
-            </div>
-          </div>
+                const bubble = document.getElementById(loadingId);
+                if (bubble) {
+                    bubble.className = 'bg-workbench-950 border border-slate-800 rounded-xl p-3.5 text-slate-200 mr-3 leading-relaxed space-y-1.5';
+                    bubble.innerHTML = `
+                        <span class="font-bold block text-[10px] uppercase text-cyan-400 mb-1.5 pb-1 border-b border-slate-800/80">
+                            <i class="fa-solid fa-user-gear mr-1"></i>Kỹ thuật viên AI:
+                        </span>
+                        <div class="space-y-1.5 text-xs leading-relaxed">${renderMarkdown(reply)}</div>
+                    `;
+                }
+            } catch (e) {
+                const bubble = document.getElementById(loadingId);
+                if (bubble) bubble.innerHTML = `<span class="text-rose-400">Lỗi: ${escapeHtml(e.message)}</span>`;
+            } finally {
+                sendBtn.disabled = false;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
 
-          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs">
-            <span class="text-slate-400">Màn hình & Cổ cáp: </span>
-            <span class="text-white font-semibold">${escapeHtml(d.displayTypeAndFlex || 'Kiểm tra mã cáp màn hình trước khi đặt linh kiện')}</span>
-          </div>
+        /********************************************************************
+         * 10. MARKDOWN FORMATTER FOR AI CHAT REPLIES
+         ********************************************************************/
+        function formatInlineMarkdown(escapedLine) {
+            return escapedLine
+                // Inline code `...`
+                .replace(/`([^`]+)`/g, '<code class="font-mono text-[11px] text-cyan-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700/80">$1</code>')
+                // Bold **...**
+                .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-bold">$1</strong>')
+                // Bold __...__
+                .replace(/__([^_]+)__/g, '<strong class="text-white font-bold">$1</strong>')
+                // Italic *...* (single asterisk not adjacent to space)
+                .replace(/(^|[^*])\*([^*\s][^*]*)\*(?!\*)/g, '$1<em class="text-slate-300 italic">$2</em>');
+        }
 
-          <!-- 4 Nút kiểm tra nguồn uy tín -->
-          <div class="grid grid-cols-2 gap-2 text-xs pt-1">
-            <a href="[https://www.google.com/search?q=site:gsmarena.com+$](https://www.google.com/search?q=site:gsmarena.com+$){gsmQuery}" target="_blank" class="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-900 border border-emerald-500/30 text-emerald-300 font-semibold flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-shield-check"></i> Soi GSMArena
-            </a>
-            <a href="[https://www.google.com/search?q=site:devicespecifications.com+$](https://www.google.com/search?q=site:devicespecifications.com+$){gsmQuery}" target="_blank" class="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-900 border border-sky-500/30 text-sky-300 font-semibold flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-microchip"></i> Soi DeviceSpecs
-            </a>
-            <a href="[https://www.google.com/search?q=site:ifixit.com+$](https://www.google.com/search?q=site:ifixit.com+$){gsmQuery}+teardown" target="_blank" class="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-900 border border-amber-500/30 text-amber-300 font-semibold flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-screwdriver-wrench"></i> Ảnh tháo iFixit
-            </a>
-            <a href="[https://www.google.com/search?q=$](https://www.google.com/search?q=$){encodeURIComponent(deviceName + ' ' + modelCodes)}&tbm=isch" target="_blank" class="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-900 border border-purple-500/30 text-purple-300 font-semibold flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-images"></i> Đối Chiếu Ảnh Thật
-            </a>
-          </div>
-        </div>
+        function renderMarkdown(rawText) {
+            if (!rawText) return '';
+            // Escape HTML first to prevent XSS, then parse Markdown syntax
+            const safeText = escapeHtml(rawText).replace(/\*\*\s*\n\s*/g, '** ');
+            const lines = safeText.split(/\r?\n/);
+            const htmlParts = [];
 
-        <!-- 4. VIDEO THÁO LẮP YOUTUBE / TIKTOK / SƠ ĐỒ MẠCH -->
-        <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 space-y-2.5">
-          <h3 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-brands fa-youtube text-rose-500 text-base"></i>
-            Video Tháo Lắp & Sửa Chữa Thực Tế
-          </h3>
-          <div class="grid grid-cols-2 gap-2.5 text-xs">
-            <a href="[https://www.youtube.com/results?search_query=$](https://www.youtube.com/results?search_query=$){ytQuery}" target="_blank" class="p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-200 font-bold flex items-center gap-2">
-              <i class="fa-brands fa-youtube text-rose-400 text-base"></i>
-              <span>Video Tháo Máy</span>
-            </a>
-            <a href="[https://www.youtube.com/results?search_query=$](https://www.youtube.com/results?search_query=$){screenQuery}" target="_blank" class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 font-semibold flex items-center gap-2">
-              <i class="fa-solid fa-mobile-screen text-sky-400 text-base"></i>
-              <span>Thay Màn / Ép Kính</span>
-            </a>
-            <a href="[https://www.youtube.com/results?search_query=$](https://www.youtube.com/results?search_query=$){batteryQuery}" target="_blank" class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 font-semibold flex items-center gap-2">
-              <i class="fa-solid fa-battery-full text-emerald-400 text-base"></i>
-              <span>Video Thay Pin</span>
-            </a>
-            <a href="[https://www.google.com/search?q=$](https://www.google.com/search?q=$){schematicQuery}" target="_blank" class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 font-semibold flex items-center gap-2">
-              <i class="fa-solid fa-file-pdf text-amber-400 text-base"></i>
-              <span>Sơ Đồ Schematic</span>
-            </a>
-          </div>
-        </div>
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
 
-        <!-- 5. CÁC DÒNG MÁY NGOẠI HÌNH GIỐNG DỄ NHẦM -->
-        ${similarList.length > 0 ? `
-          <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 space-y-2.5">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-clone text-amber-400"></i>
-              Phân Biệt Với Máy Ngoại Hình Giống
-            </h3>
-            <div class="space-y-2">
-              ${similarList.map(function(s) {
-                return `
-                  <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs leading-relaxed">
-                    <span class="font-bold text-amber-400">${escapeHtml(s.name)}:</span>
-                    <span class="text-slate-300 ml-1">${escapeHtml(s.difference)}</span>
-                  </div>
+                if (!line) {
+                    continue;
+                }
+
+                // Horizontal Rule (--- or ***)
+                if (/^(-{3,}|\*{3,})$/.test(line)) {
+                    htmlParts.push('<hr class="border-slate-800 my-2">');
+                    continue;
+                }
+
+                // Headings: ####, ###, ##, #
+                const headingMatch = line.match(/^(#{1,4})\s+(.+)$/);
+                if (headingMatch) {
+                    const level = headingMatch[1].length;
+                    const content = formatInlineMarkdown(headingMatch[2]);
+                    if (level <= 2) {
+                        htmlParts.push(`<div class="font-extrabold text-emerald-400 text-xs sm:text-sm pt-2 pb-0.5 border-b border-slate-800/70">${content}</div>`);
+                    } else {
+                        htmlParts.push(`<div class="font-bold text-amber-300 text-xs pt-1.5">${content}</div>`);
+                    }
+                    continue;
+                }
+
+                // Bullet points: * item or - item or • item
+                const bulletMatch = line.match(/^([*\-•])\s+(.+)$/);
+                if (bulletMatch) {
+                    const content = formatInlineMarkdown(bulletMatch[2]);
+                    htmlParts.push(`
+                        <div class="flex items-start gap-2 pl-1">
+                            <span class="text-emerald-400 font-bold select-none mt-0.5">•</span>
+                            <span class="flex-1 text-slate-200">${content}</span>
+                        </div>
+                    `);
+                    continue;
+                }
+
+                // Numbered list: 1. item, 2. item
+                const numMatch = line.match(/^(\d+[.)])\s+(.+)$/);
+                if (numMatch) {
+                    const badge = numMatch[1];
+                    const content = formatInlineMarkdown(numMatch[2]);
+                    htmlParts.push(`
+                        <div class="flex items-start gap-1.5 pl-0.5 pt-0.5">
+                            <span class="font-mono font-bold text-cyan-400 shrink-0">${badge}</span>
+                            <span class="flex-1 text-slate-200">${content}</span>
+                        </div>
+                    `);
+                    continue;
+                }
+
+                // Normal paragraph line
+                htmlParts.push(`<p class="text-slate-200">${formatInlineMarkdown(line)}</p>`);
+            }
+
+            return htmlParts.join('');
+        }
+
+        /********************************************************************
+         * 11. LOCALSTORAGE SCAN HISTORY MANAGEMENT
+         ********************************************************************/
+        function getScanHistory() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.SCAN_HISTORY);
+                return raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveScanToHistory(analysisData, thumbnailDataUrl) {
+            let history = getScanHistory();
+            const newEntry = {
+                id: 'scan_' + Date.now(),
+                timestamp: new Date().toLocaleString('vi-VN'),
+                thumbnail: thumbnailDataUrl || '',
+                data: analysisData
+            };
+            // Prepend and keep max 25 items so localStorage never overflows
+            history.unshift(newEntry);
+            if (history.length > 25) history = history.slice(0, 25);
+
+            try {
+                localStorage.setItem(STORAGE_KEYS.SCAN_HISTORY, JSON.stringify(history));
+            } catch (e) {
+                // If quota exceeded, strip thumbnails from older entries
+                history = history.slice(0, 10);
+                localStorage.setItem(STORAGE_KEYS.SCAN_HISTORY, JSON.stringify(history));
+            }
+            renderHistoryList();
+        }
+
+        function renderHistoryList() {
+            const history = getScanHistory();
+            const container = document.getElementById('historyListContainer');
+            const navBadge = document.getElementById('navHistoryCount');
+            const filterText = (document.getElementById('historySearchInput')?.value || '').toLowerCase().trim();
+
+            if (history.length > 0) {
+                navBadge.textContent = history.length;
+                navBadge.classList.remove('hidden');
+            } else {
+                navBadge.classList.add('hidden');
+            }
+
+            const filtered = history.filter(item => {
+                const name = (item.data?.modelName || '').toLowerCase();
+                const codes = (item.data?.modelCodes || '').toLowerCase();
+                return name.includes(filterText) || codes.includes(filterText);
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-workbench-950 border border-slate-800 rounded-xl p-6 text-center space-y-2">
+                        <i class="fa-solid fa-box-open text-2xl text-slate-600"></i>
+                        <p class="text-xs text-slate-400">Chưa có lịch sử máy nào được lưu.</p>
+                    </div>
                 `;
-              }).join('')}
-            </div>
-          </div>
-        ` : ''}
+                return;
+            }
 
-        <!-- 6. KHUNG HỎI THÊM AI VỀ PAN BỆNH CỦA MÁY NÀY (ĐÃ FIX MARKDOWN ** VÀ ###) -->
-        <div class="bg-[#111827] border border-emerald-500/30 rounded-2xl p-4 space-y-3">
-          <h3 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-robot text-emerald-400"></i>
-            Hỏi Thêm AI Về Pan Bệnh Của Máy Này
-          </h3>
-
-          <div id="chatMessagesBox" class="max-h-80 overflow-y-auto space-y-2.5 pr-1">
-            <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300">
-              Bạn đang thao tác trên chiếc <strong class="text-emerald-400">${escapeHtml(deviceName)}</strong>. Hãy bấm câu hỏi nhanh bên dưới hoặc nhập pan bệnh (sạc không vào, mất đèn màn hình, chạm nguồn...) để kỹ thuật viên AI hướng dẫn:
-            </div>
-          </div>
-
-          <div class="flex gap-2 overflow-x-auto pb-1">
-            <button onclick="askFollowUpQuestion('Cách tháo nắp lưng và màn hình máy này an toàn nhất để không đứt cáp?')" class="shrink-0 text-[11px] bg-slate-900 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-full border border-slate-700">
-              Cách tháo an toàn?
-            </button>
-            <button onclick="askFollowUpQuestion('Máy này sạc không vào hoặc báo nhiệt độ pin thì đo kiểm tra những điểm nào?')" class="shrink-0 text-[11px] bg-slate-900 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-full border border-slate-700">
-              Sạc không vào / Báo nhiệt độ?
-            </button>
-            <button onclick="askFollowUpQuestion('Màn hình và Pin của máy này có dùng chung được với dòng máy nào khác không?')" class="shrink-0 text-[11px] bg-slate-900 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-full border border-slate-700">
-              Linh kiện dùng chung?
-            </button>
-          </div>
-
-          <div class="flex gap-2">
-            <input
-              type="text"
-              id="chatInput"
-              placeholder="Hỏi cách tháo, đo chạm, mã IC, linh kiện..."
-              class="flex-1 bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none"
-              onkeydown="if(event.key==='Enter') askFollowUpQuestion()"
-            />
-            <button onclick="askFollowUpQuestion()" id="btnSendChat" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 rounded-xl flex items-center gap-1.5 shrink-0">
-              <i class="fa-solid fa-paper-plane"></i> Gửi
-            </button>
-          </div>
-        </div>
-      `;
-
-      container.classList.remove('hidden');
-      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    // CHAT HỎI ĐÁP KỸ THUẬT CHO MÁY ĐANG MỞ
-    async function askFollowUpQuestion(presetText) {
-      if (!state.currentDeviceData) return;
-      const inputEl = document.getElementById('chatInput');
-      const question = (presetText || (inputEl ? inputEl.value : '') || '').trim();
-      if (!question) return;
-
-      if (inputEl && !presetText) inputEl.value = '';
-
-      const chatBox = document.getElementById('chatMessagesBox');
-      const btnSend = document.getElementById('btnSendChat');
-
-      // Thêm câu hỏi của bạn
-      chatBox.innerHTML += `
-        <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-100 ml-6">
-          <div class="text-[10px] font-bold text-emerald-400 mb-0.5">BẠN:</div>
-          <div>${escapeHtml(question)}</div>
-        </div>
-      `;
-
-      const loadingId = 'chat_load_' + Date.now();
-      chatBox.innerHTML += `
-        <div id="${loadingId}" class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400">
-          <i class="fa-solid fa-spinner fa-spin text-emerald-400 mr-1.5"></i> Kỹ thuật viên AI đang tra sơ đồ và soạn hướng dẫn...
-        </div>
-      `;
-      chatBox.scrollTop = chatBox.scrollHeight;
-      if (btnSend) btnSend.disabled = true;
-
-      try {
-        const d = state.currentDeviceData;
-        const prompt = `Bạn là Kỹ sư trưởng dạy sửa chữa phần cứng điện thoại. Người học đang hỏi về chiếc máy: "${d.deviceName}" (Mã Model: ${(d.modelCodes || []).join(', ')}).
-Câu hỏi: "${question}"
-Hãy trả lời ngắn gọn, đi thẳng vào kỹ thuật thực chiến (nhiệt độ, vị trí cáp, điểm đo áp VBAT/VBUS, linh kiện dùng chung). Sử dụng tiếng Việt rõ ràng.`;
-
-        const replyText = await callGeminiSmart([{
-          role: 'user',
-          parts: [{ text: prompt }]
-        }], false);
-
-        const loadEl = document.getElementById(loadingId);
-        if (loadEl) loadEl.remove();
-
-        // Hiển thị bằng bộ renderMarkdown đã fix lỗi ** và ###
-        chatBox.innerHTML += `
-          <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200">
-            <div class="text-[10px] font-extrabold text-emerald-400 mb-1.5 flex items-center gap-1.5">
-              <i class="fa-solid fa-user-gear"></i> KỸ THUẬT VIÊN AI:
-            </div>
-            <div class="ai-markdown">${renderMarkdown(replyText)}</div>
-          </div>
-        `;
-        chatBox.scrollTop = chatBox.scrollHeight;
-      } catch (err) {
-        const loadEl = document.getElementById(loadingId);
-        if (loadEl) {
-          loadEl.innerHTML = `<span class="text-rose-400">Lỗi: ${escapeHtml(err.message)}</span>`;
+            container.innerHTML = filtered.map(item => `
+                <div class="bg-workbench-950 border border-slate-800 hover:border-emerald-500/40 rounded-xl p-3 flex items-center justify-between gap-3 transition">
+                    <div class="flex items-center gap-3 min-w-0 flex-1" onclick="openHistoryItem('${item.id}')" role="button">
+                        ${item.thumbnail 
+                            ? `<img src="${item.thumbnail}" alt="Thumb" class="w-12 h-12 rounded-lg object-cover border border-slate-700 shrink-0">`
+                            : `<div class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center text-emerald-400 shrink-0"><i class="fa-solid fa-mobile-screen"></i></div>`
+                        }
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-xs sm:text-sm text-white truncate">${escapeHtml(item.data?.modelName || 'Máy đã quét')}</h4>
+                            <p class="text-[11px] font-mono text-cyan-400 truncate">${escapeHtml(item.data?.modelCodes || '')}</p>
+                            <p class="text-[10px] text-slate-500 mt-0.5">${escapeHtml(item.timestamp)}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="openHistoryItem('${item.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-semibold active:scale-95">
+                            Xem
+                        </button>
+                        <button onclick="deleteHistoryItem('${item.id}')" class="p-1.5 rounded-lg bg-rose-950/40 text-rose-400 border border-rose-800/40 text-xs active:scale-95">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
-      } finally {
-        if (btnSend) btnSend.disabled = false;
-      }
-    }
 
-    // QUẢN LÝ LỊCH SỬ TRA CỨU
-    function renderHistoryList() {
-      const listEl = document.getElementById('historyList');
-      const badgeEl = document.getElementById('historyCountBadge');
-      if (!listEl) return;
-
-      if (badgeEl) {
-        if (state.history.length > 0) {
-          badgeEl.textContent = state.history.length;
-          badgeEl.classList.remove('hidden');
-        } else {
-          badgeEl.classList.add('hidden');
+        function openHistoryItem(id) {
+            const history = getScanHistory();
+            const found = history.find(h => h.id === id);
+            if (!found) return;
+            currentAnalysisData = found.data;
+            switchTab('scan');
+            renderAnalysisResult(found.data);
+            showToast(`Đang xem lại: ${found.data.modelName}`, 'info');
         }
-      }
 
-      if (!state.history.length) {
-        listEl.innerHTML = `
-          <div class="bg-[#111827] border border-slate-800 rounded-2xl p-6 text-center text-xs text-slate-400">
-            Chưa có lịch sử tra cứu máy nào.
-          </div>
-        `;
-        return;
-      }
-
-      listEl.innerHTML = state.history.map(function(item) {
-        const d = item.data || {};
-        const codes = Array.isArray(d.modelCodes) ? d.modelCodes.join(', ') : '';
-        return `
-          <div onclick="openHistoryItem('${item.id}')" class="cursor-pointer bg-[#111827] hover:bg-slate-900 border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between gap-3 active:scale-[0.99] transition">
-            <div>
-              <div class="text-xs font-extrabold text-white">${escapeHtml(d.deviceName || 'Thiết bị')}</div>
-              <div class="text-[11px] font-mono-code text-emerald-400 mt-0.5">${escapeHtml(codes)}</div>
-              <div class="text-[10px] text-slate-400 mt-1">${escapeHtml(item.timestamp)} • ${escapeHtml(d.entryMethod || '')}</div>
-            </div>
-            <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function openHistoryItem(id) {
-      const found = state.history.find(function(h) { return h.id === id; });
-      if (!found) return;
-      state.currentDeviceData = found.data;
-      switchTab('scan');
-      renderDeviceResult(found.data);
-    }
-
-    function clearAllHistory() {
-      state.history = [];
-      saveStateToStorage();
-      renderHistoryList();
-    }
-
-    // SAO LƯU & KHÔI PHỤC JSON
-    function exportBackupJson() {
-      const payload = {
-        apiKeys: state.apiKeys,
-        activeKeyId: state.activeKeyId,
-        history: state.history,
-        exportedAt: new Date().toISOString()
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'phonefix-ai-backup.json';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function importBackupJson(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const data = JSON.parse(e.target.result);
-          if (Array.isArray(data.apiKeys)) state.apiKeys = data.apiKeys;
-          if (data.activeKeyId) state.activeKeyId = data.activeKeyId;
-          if (Array.isArray(data.history)) state.history = data.history;
-          saveStateToStorage();
-          renderHeaderKeyStatus();
-          renderApiKeyList();
-          renderHistoryList();
-          alert('Đã khôi phục Key và Lịch sử thành công!');
-        } catch (err) {
-          showError('File sao lưu không hợp lệ.');
+        function deleteHistoryItem(id) {
+            let history = getScanHistory().filter(h => h.id !== id);
+            localStorage.setItem(STORAGE_KEYS.SCAN_HISTORY, JSON.stringify(history));
+            renderHistoryList();
+            showToast('Đã xoá mục lịch sử.', 'info');
         }
-      };
-      reader.readAsText(file);
-    }
-  </script>
+
+        function clearAllHistory() {
+            localStorage.removeItem(STORAGE_KEYS.SCAN_HISTORY);
+            renderHistoryList();
+            showToast('Đã xoá toàn bộ lịch sử tra cứu.', 'warning');
+        }
+
+        /********************************************************************
+         * 12. MANUAL SEARCH TOOL (TAB 3)
+         ********************************************************************/
+        function setManualModel(name) {
+            const input = document.getElementById('manualModelInput');
+            input.value = name;
+            updateManualSearchLinks();
+        }
+
+        function updateManualSearchLinks() {
+            const val = document.getElementById('manualModelInput').value.trim() || 'Redmi Note 8';
+            renderPlatformLinksInto(val, 'manualLinksContainer');
+        }
+
+        /********************************************************************
+         * 13. DYNAMIC PWA MANIFEST & SERVICE WORKER EXPORT
+         ********************************************************************/
+        function getManifestJsonContent() {
+            return JSON.stringify({
+                name: "PhoneFix AI - Trợ Lý Sửa Chữa Điện Thoại",
+                short_name: "PhoneFix AI",
+                description: "Ứng dụng nhận diện tên máy, thông số kỹ thuật, cảnh báo tháo lắp và tìm video sửa chữa điện thoại bằng Gemini AI.",
+                start_url: "./index.html",
+                display: "standalone",
+                background_color: "#070a12",
+                theme_color: "#090d16",
+                orientation: "portrait",
+                icons: [
+                    {
+                        src: "https://cdn-icons-png.flaticon.com/512/3659/3659899.png",
+                        sizes: "512x512",
+                        type: "image/png",
+                        purpose: "any maskable"
+                    }
+                ]
+            }, null, 2);
+        }
+
+        function getServiceWorkerContent() {
+            return `const CACHE_NAME = 'phonefix-ai-v2';
+const ASSETS = ['./', './index.html', './manifest.json'];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
+  );
+});`;
+        }
+
+        function initPwaManifestAndServiceWorker() {
+            try {
+                const manifestBlob = new Blob([getManifestJsonContent()], { type: 'application/json' });
+                const manifestUrl = URL.createObjectURL(manifestBlob);
+                const link = document.createElement('link');
+                link.rel = 'manifest';
+                link.href = manifestUrl;
+                document.head.appendChild(link);
+            } catch (e) {
+                // Ignore in restricted iframe environments
+            }
+        }
+
+        function downloadFileHelper(filename, content, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Đã tải xuống file ${filename}`, 'success');
+        }
+
+        function downloadManifestFile() {
+            downloadFileHelper('manifest.json', getManifestJsonContent(), 'application/json');
+        }
+
+        function downloadServiceWorkerFile() {
+            downloadFileHelper('sw.js', getServiceWorkerContent(), 'application/javascript');
+        }
+
+        function downloadSelfHtml() {
+            const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            downloadFileHelper('index.html', fullHtml, 'text/html');
+        }
+
+        // Security helper to escape HTML strings
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
 </body>
 </html>
