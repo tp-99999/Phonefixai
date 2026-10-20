@@ -119,7 +119,7 @@
                         <h1 class="font-extrabold text-base tracking-tight text-white leading-none">PhoneFix <span class="text-emerald-400">AI</span></h1>
                         <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 border border-slate-700 font-semibold">PRO</span>
                     </div>
-                    <p class="text-[11px] text-slate-400 mt-0.5 truncate max-w-[165px] sm:max-w-xs">Trợ lý Học & Sửa Chữa ĐT</p>
+                    <p id="headerModelSubtext" class="text-[10px] font-mono text-slate-400 mt-0.5 truncate max-w-[165px] sm:max-w-xs">Model: Tự động (Auto)</p>
                 </div>
             </div>
 
@@ -128,7 +128,7 @@
                 <!-- API Key Status Pill -->
                 <button onclick="switchTab('settings')" id="headerKeyStatusBtn" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium border transition-all active:scale-95">
                     <span id="headerKeyDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                    <span id="headerKeyText" class="truncate max-w-[110px]">Chưa có Key</span>
+                    <span id="headerKeyText" class="truncate max-w-[115px]">Chưa có Key</span>
                 </button>
 
                 <!-- Install PWA Quick Button (Shown when installable) -->
@@ -265,7 +265,7 @@
                     
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                         <span class="text-[11px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">
-                            <i class="fa-solid fa-check-Double mr-1"></i> Kết Quả Nhận Diện
+                            <i class="fa-solid fa-check-double mr-1"></i> Kết Quả Nhận Diện
                         </span>
                         <span id="resConfidenceBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                             Độ chính xác: Cao
@@ -296,7 +296,7 @@
                     </p>
                 </div>
 
-                <!-- 2. CRITICAL REPAIR & DISASSEMBLY WARNING CARD (Entry Method, Heat, Flex Cables) -->
+                <!-- 2. CRITICAL REPAIR & DISASSEMBLY WARNING CARD (Entry Method, Heat, Flex Cables, Step-by-Step) -->
                 <div class="bg-gradient-to-b from-amber-950/35 to-workbench-900 border-2 border-amber-500/50 rounded-2xl p-4 shadow-xl space-y-3.5">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
@@ -344,6 +344,17 @@
                         </p>
                     </div>
 
+                    <!-- Step-by-Step Disassembly Checklist -->
+                    <div class="bg-workbench-950/90 border border-emerald-500/30 rounded-xl p-3">
+                        <div class="flex items-center gap-1.5 text-emerald-300 font-bold text-xs mb-2">
+                            <i class="fa-solid fa-list-ol"></i>
+                            <span>QUY TRÌNH THÁO MÁY TỪNG BƯỚC CHO HỌC VIÊN:</span>
+                        </div>
+                        <ol id="resDisassemblySteps" class="space-y-1.5 text-xs text-slate-200 list-decimal list-inside leading-relaxed">
+                            <!-- Dynamically populated -->
+                        </ol>
+                    </div>
+
                     <!-- Common Hardware Issues of this Model -->
                     <div class="bg-workbench-950/80 border border-slate-800 rounded-xl p-3">
                         <div class="flex items-center gap-1.5 text-cyan-300 font-bold text-xs mb-1">
@@ -367,7 +378,7 @@
                     </div>
 
                     <div id="resVideoLinksGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        <!-- Dynamically populated by renderVideoLinks(modelName) -->
+                        <!-- Dynamically populated by renderPlatformLinksInto(modelName) -->
                     </div>
                 </div>
 
@@ -515,9 +526,9 @@
                 <!-- Preset Popular Models for Students -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px]">
                     <span class="text-slate-400 shrink-0">Thử nhanh:</span>
+                    <button onclick="setManualModel('Redmi Note 8')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 border border-slate-700">Redmi Note 8</button>
                     <button onclick="setManualModel('iPhone 13 Pro Max')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 border border-slate-700">iPhone 13 Pro Max</button>
                     <button onclick="setManualModel('Samsung Galaxy A54 5G')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 border border-slate-700">Galaxy A54 5G</button>
-                    <button onclick="setManualModel('Redmi Note 11')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 border border-slate-700">Redmi Note 11</button>
                     <button onclick="setManualModel('Oppo A57')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 border border-slate-700">Oppo A57</button>
                 </div>
 
@@ -581,7 +592,7 @@
                 <div class="bg-workbench-950 border border-slate-800 rounded-xl p-3.5 space-y-3">
                     <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Thêm API Key Mới</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                        <input type="text" id="newKeyLabelInput" placeholder="Tên gợi nhớ (VD: Key Chính)" 
+                        <input type="text" id="newKeyLabelInput" placeholder="Tên gợi nhớ (VD: Key 1)" 
                             class="bg-workbench-900 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none">
                         <div class="sm:col-span-2 relative">
                             <input type="password" id="newKeyValueInput" placeholder="Dán mã AIzaSy... vào đây" 
@@ -596,7 +607,7 @@
                             <i class="fa-solid fa-plus"></i> Lưu Key Vào Thiết Bị
                         </button>
                         <button onclick="testActiveApiKey()" id="testKeyBtn" class="py-2.5 px-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition active:scale-95">
-                            <i class="fa-solid fa-plug-circle-check"></i> Kiểm Tra Key Đang Chọn
+                            <i class="fa-solid fa-plug-circle-check"></i> Kiểm Tra Key & Dò Model
                         </button>
                     </div>
                 </div>
@@ -612,22 +623,37 @@
                     </div>
                 </div>
 
-                <!-- AI Model Selection -->
-                <div class="pt-2 border-t border-slate-800/80 space-y-2">
-                    <label for="modelSelectDropdown" class="block text-xs font-bold text-slate-200">
-                        <i class="fa-solid fa-sliders text-cyan-400 mr-1"></i> Chọn Моđun AI Gemini:
-                    </label>
+                <!-- AI Model Selection (With Smart Auto-Discovery & Anti-Deprecation) -->
+                <div class="pt-3 border-t border-slate-800/80 space-y-2.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <label for="modelSelectDropdown" class="block text-xs font-bold text-slate-200">
+                            <i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Chọn Model AI (Chống lỗi ngừng hỗ trợ):
+                        </label>
+                        <button onclick="discoverModelsFromKeyUI()" id="discoverModelsBtn" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 flex items-center gap-1 transition active:scale-95">
+                            <i class="fa-solid fa-Arrows-rotate"></i> Dò danh sách Model từ Key
+                        </button>
+                    </div>
+
                     <select id="modelSelectDropdown" onchange="handleModelSelectionChange()" 
                         class="w-full bg-workbench-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-xs sm:text-sm text-white outline-none">
-                        <option value="gemini-2.5-flash">gemini-2.5-flash (Khuyên dùng - Nhanh, Chuẩn & Miễn phí)</option>
+                        <option value="auto">✨ Tự động dò Model mới nhất (Khuyên dùng - Không lo lỗi Model)</option>
+                        <option value="gemini-3.0-flash">gemini-3.0-flash (Mới nhất cho Key mới)</option>
+                        <option value="gemini-3-flash-preview">gemini-3-flash-preview (Bản Gemini 3 Flash)</option>
+                        <option value="gemini-2.5-flash">gemini-2.5-flash (Bản 2.5 Flash)</option>
+                        <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Siêu nhanh, tiết kiệm)</option>
                         <option value="gemini-2.5-pro">gemini-2.5-pro (Chuyên sâu cho pan khó)</option>
-                        <option value="gemini-2.0-flash">gemini-2.0-flash (Tốc độ cao, ổn định)</option>
-                        <option value="custom">Tùy chỉnh tên Model khác...</option>
+                        <option value="custom">✍️ Tự nhập tên Model bất kỳ...</option>
                     </select>
+
+                    <!-- Status info of currently resolved model -->
+                    <div class="bg-workbench-950/90 border border-slate-800/90 rounded-xl p-2.5 text-[11px] text-slate-400 flex items-center justify-between gap-2">
+                        <span>Model thực tế đang hoạt động:</span>
+                        <span id="resolvedActiveModelBadge" class="font-mono font-semibold text-emerald-400">gemini-3.0-flash (Auto)</span>
+                    </div>
 
                     <!-- Custom Model ID Input (Hidden unless 'custom' selected) -->
                     <div id="customModelInputWrapper" class="hidden pt-1">
-                        <input type="text" id="customModelIdInput" oninput="saveCustomModelId()" placeholder="Nhập mã model (VD: gemini-2.5-flash-lite)" 
+                        <input type="text" id="customModelIdInput" oninput="saveCustomModelId()" placeholder="Nhập mã model (VD: gemini-3.0-flash)" 
                             class="w-full bg-workbench-950 border border-cyan-500/50 rounded-xl px-3 py-2 text-xs font-mono text-cyan-300 outline-none">
                     </div>
                 </div>
@@ -729,11 +755,24 @@
          * 1. STATE & LOCALSTORAGE KEYS
          ********************************************************************/
         const STORAGE_KEYS = {
-            API_KEYS_LIST: 'phonefix_gemini_keys',     // Array of { id, label, key, createdAt }
-            ACTIVE_KEY_ID: 'phonefix_active_key_id',   // ID of selected key
-            SELECTED_MODEL: 'phonefix_selected_model', // Model string
-            SCAN_HISTORY: 'phonefix_scan_history'      // Array of saved phone scans
+            API_KEYS_LIST: 'phonefix_gemini_keys',          // Array of { id, label, key, createdAt }
+            ACTIVE_KEY_ID: 'phonefix_active_key_id',        // ID of selected key
+            SELECTED_MODEL: 'phonefix_selected_model_v2',   // 'auto' by default so old deprecated model settings are upgraded
+            CACHED_WORKING_MODEL: 'phonefix_working_model', // Last verified working model ID
+            DISCOVERED_MODELS: 'phonefix_discovered_models',// Array of model names fetched from API
+            SCAN_HISTORY: 'phonefix_scan_history'           // Array of saved phone scans
         };
+
+        // Ordered fallback candidates (newest & most reliable first)
+        const FALLBACK_MODEL_PRIORITY = [
+            'gemini-3.0-flash',
+            'gemini-3-flash-preview',
+            'gemini-2.5-flash',
+            'gemini-2.5-flash-lite',
+            'gemini-3.0-pro',
+            'gemini-2.5-pro',
+            'gemini-2.0-flash'
+        ];
 
         let currentCompressedBase64 = null; // Base64 string without data:image/jpeg;base64, prefix
         let currentThumbnailDataUrl = null; // Smaller thumbnail for saving in localStorage history
@@ -745,9 +784,10 @@
          ********************************************************************/
         window.addEventListener('DOMContentLoaded', () => {
             initPwaManifestAndServiceWorker();
+            populateDiscoveredModelsInDropdown();
             loadSavedSettingsUI();
             renderHistoryList();
-            setManualModel('Samsung Galaxy S22 Ultra 5G');
+            setManualModel('Redmi Note 8');
         });
 
         // Listen for PWA Installable event
@@ -814,18 +854,18 @@
             };
 
             toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-2xl backdrop-blur-md text-xs font-semibold transition-all duration-300 ${colorMap[type] || colorMap.info}`;
-            toast.innerHTML = `<i class="fa-solid ${iconMap[type] || iconMap.info} text-sm shrink-0"></i><span>${message}</span>`;
+            toast.innerHTML = `<i class="fa-solid ${iconMap[type] || iconMap.info} text-sm shrink-0"></i><span class="leading-relaxed">${escapeHtml(message)}</span>`;
             
             container.appendChild(toast);
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateY(-8px)';
                 setTimeout(() => toast.remove(), 300);
-            }, 3200);
+            }, 3800);
         }
 
         /********************************************************************
-         * 5. GEMINI API KEY MANAGEMENT (LOCALSTORAGE)
+         * 5. GEMINI API KEY & SMART MODEL FALLBACK ENGINE
          ********************************************************************/
         function getSavedApiKeys() {
             try {
@@ -847,8 +887,228 @@
             return keys.find(k => k.id === activeId) || keys[0];
         }
 
-        function getSelectedModelId() {
-            return localStorage.getItem(STORAGE_KEYS.SELECTED_MODEL) || 'gemini-2.5-flash';
+        function getSelectedModelSetting() {
+            return localStorage.getItem(STORAGE_KEYS.SELECTED_MODEL) || 'auto';
+        }
+
+        function getInitialModelToTry() {
+            const setting = getSelectedModelSetting();
+            if (setting && setting !== 'auto') {
+                return setting;
+            }
+            const cachedWorking = localStorage.getItem(STORAGE_KEYS.CACHED_WORKING_MODEL);
+            if (cachedWorking) {
+                return cachedWorking;
+            }
+            return 'gemini-3.0-flash';
+        }
+
+        /**
+         * Queries Google's /v1beta/models endpoint to discover all models available
+         * to the user's specific API Key that support `generateContent`.
+         */
+        async function fetchAvailableModelsForKey(apiKey) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+                if (!response.ok) return [];
+                const data = await response.json();
+                const models = Array.isArray(data.models) ? data.models : [];
+
+                // Filter models that support generateContent and are multimodal/text Gemini models
+                const supported = models
+                    .filter(m => {
+                        const methods = m.supportedGenerationMethods || [];
+                        const name = (m.name || '').toLowerCase();
+                        if (!methods.includes('generateContent')) return false;
+                        // Exclude specialized non-vision/text models (tts, embedding, imagen, veo, aqa)
+                        if (name.includes('embedding') || name.includes('tts') || name.includes('imagen') || name.includes('veo') || name.includes('aqa') || name.includes('bisheng')) {
+                            return false;
+                        }
+                        return name.includes('gemini');
+                    })
+                    .map(m => m.name.replace(/^models\//, ''));
+
+                // Sort so flash models and newer versions (3.x > 2.5 > 2.0) come first
+                supported.sort((a, b) => {
+                    const score = (id) => {
+                        let s = 0;
+                        if (id === 'gemini-3.0-flash') s += 1000;
+                        if (id === 'gemini-3-flash-preview') s += 950;
+                        if (id.includes('gemini-3')) s += 500;
+                        else if (id.includes('gemini-2.5')) s += 300;
+                        else if (id.includes('gemini-2.0')) s += 100;
+                        if (id.includes('flash') && !id.includes('lite')) s += 80;
+                        if (id.includes('flash-lite')) s += 40;
+                        if (!id.includes('exp') && !id.includes('001')) s += 20;
+                        return s;
+                    };
+                    return score(b) - score(a);
+                });
+
+                if (supported.length > 0) {
+                    localStorage.setItem(STORAGE_KEYS.DISCOVERED_MODELS, JSON.stringify(supported));
+                    populateDiscoveredModelsInDropdown();
+                }
+                return supported;
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function populateDiscoveredModelsInDropdown() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.DISCOVERED_MODELS);
+                if (!raw) return;
+                const list = JSON.parse(raw);
+                if (!Array.isArray(list) || list.length === 0) return;
+
+                const dropdown = document.getElementById('modelSelectDropdown');
+                const currentVal = dropdown.value;
+
+                // Keep static options and add any newly discovered models before 'custom'
+                const existingValues = new Set(Array.from(dropdown.options).map(o => o.value));
+                const customOpt = dropdown.querySelector('option[value="custom"]');
+
+                list.forEach(modelId => {
+                    if (!existingValues.has(modelId)) {
+                        const opt = document.createElement('option');
+                        opt.value = modelId;
+                        opt.textContent = `${modelId} (Đã dò từ Key)`;
+                        dropdown.insertBefore(opt, customOpt);
+                        existingValues.add(modelId);
+                    }
+                });
+
+                dropdown.value = currentVal;
+            } catch (e) {
+                // Ignore JSON parse errors
+            }
+        }
+
+        /**
+         * Universal wrapper that calls Gemini generateContent with automatic model fallback
+         * if a model is deprecated ("no longer available to new users") or not found (404/400).
+         */
+        async function callGeminiWithAutoFallback(apiKey, payloadBody, onStatusUpdate) {
+            const triedModels = new Set();
+            let candidateQueue = [getInitialModelToTry(), ...FALLBACK_MODEL_PRIORITY];
+
+            // Remove duplicates while preserving order
+            candidateQueue = [...new Set(candidateQueue)];
+
+            let hasFetchedDynamicModels = false;
+            let lastErrorMessage = 'Không thể kết nối tới Gemini API';
+
+            while (candidateQueue.length > 0) {
+                const modelId = candidateQueue.shift();
+                if (!modelId || triedModels.has(modelId)) continue;
+                triedModels.add(modelId);
+
+                if (typeof onStatusUpdate === 'function') {
+                    onStatusUpdate(modelId);
+                }
+
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payloadBody)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.candidates) {
+                        // Save this working model so subsequent requests are instant!
+                        localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, modelId);
+                        // If user had a hardcoded broken model selected, switch them to the working one
+                        const currentSetting = getSelectedModelSetting();
+                        if (currentSetting !== 'auto' && currentSetting !== modelId) {
+                            localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, 'auto');
+                            showToast(`Đã tự động chuyển sang model mới: ${modelId}`, 'info');
+                        }
+                        loadSavedSettingsUI();
+                        return { data, usedModel: modelId };
+                    }
+
+                    const errMsg = data.error?.message || `HTTP ${response.status}`;
+                    lastErrorMessage = errMsg;
+
+                    // Check if the error is an API Key invalid error or quota error (no point trying another model if key itself is invalid)
+                    const lowerErr = errMsg.toLowerCase();
+                    if (lowerErr.includes('api_key_invalid') || lowerErr.includes('api key not valid')) {
+                        throw new Error('API Key không hợp lệ. Vui lòng kiểm tra lại mã Key trong mục Cài đặt.');
+                    }
+
+                    // Check if Google's error message explicitly recommends a replacement model
+                    // e.g., "Please update your code to use models/gemini-3.0-flash for the latest features"
+                    const suggestedMatch = errMsg.match(/models\/([a-zA-Z0-9.\-_]+)/i);
+                    if (suggestedMatch && suggestedMatch[1]) {
+                        const suggestedModel = suggestedMatch[1].trim();
+                        if (!triedModels.has(suggestedModel)) {
+                            candidateQueue.unshift(suggestedModel);
+                        }
+                    }
+
+                    // If model is unavailable / deprecated / 404 / 400, dynamically query /v1beta/models once
+                    const isModelIssue = response.status === 404 || response.status === 400 ||
+                        lowerErr.includes('no longer available') ||
+                        lowerErr.includes('not found') ||
+                        lowerErr.includes('not supported') ||
+                        lowerErr.includes('deprecated');
+
+                    if (isModelIssue && !hasFetchedDynamicModels) {
+                        hasFetchedDynamicModels = true;
+                        const discovered = await fetchAvailableModelsForKey(apiKey);
+                        discovered.forEach(dm => {
+                            if (!triedModels.has(dm)) {
+                                candidateQueue.push(dm);
+                            }
+                        });
+                    } else if (!isModelIssue) {
+                        // Non-model error (e.g. safety block or rate limit)
+                        break;
+                    }
+
+                } catch (networkOrFatalErr) {
+                    if (networkOrFatalErr.message.includes('API Key không hợp lệ')) {
+                        throw networkOrFatalErr;
+                    }
+                    lastErrorMessage = networkOrFatalErr.message;
+                }
+            }
+
+            throw new Error(lastErrorMessage);
+        }
+
+        // Button in Settings to manually discover models from the active API Key
+        async function discoverModelsFromKeyUI() {
+            const activeObj = getActiveApiKeyObj();
+            if (!activeObj) {
+                showToast('Vui lòng thêm và chọn 1 API Key trước khi dò Model!', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('discoverModelsBtn');
+            const origHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang dò...`;
+
+            try {
+                const list = await fetchAvailableModelsForKey(activeObj.key);
+                if (list.length > 0) {
+                    localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, list[0]);
+                    localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, 'auto');
+                    loadSavedSettingsUI();
+                    showToast(`Đã tìm thấy ${list.length} model khả dụng! Đã chọn: ${list[0]}`, 'success');
+                } else {
+                    showToast('Không lấy được danh sách model. Hãy kiểm tra lại Key hoặc mạng.', 'warning');
+                }
+            } catch (e) {
+                showToast('Lỗi khi dò danh sách Model từ Google.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+            }
         }
 
         function toggleNewKeyVisibility() {
@@ -863,11 +1123,11 @@
             }
         }
 
-        function addNewApiKey() {
+        async function addNewApiKey() {
             const labelInput = document.getElementById('newKeyLabelInput');
             const keyInput = document.getElementById('newKeyValueInput');
             const rawKey = keyInput.value.trim();
-            const label = labelInput.value.trim() || `Key Gemini #${getSavedApiKeys().length + 1}`;
+            const label = labelInput.value.trim() || `Key ${getSavedApiKeys().length + 1}`;
 
             if (!rawKey || rawKey.length < 20) {
                 showToast('Vui lòng dán mã Gemini API Key hợp lệ (bắt đầu bằng AIza...)', 'warning');
@@ -889,7 +1149,14 @@
             labelInput.value = '';
             keyInput.value = '';
             loadSavedSettingsUI();
-            showToast(`Đã lưu và kích hoạt "${label}" thành công!`, 'success');
+            showToast(`Đã lưu "${label}"! Đang tự động dò Model mới nhất cho Key...`, 'success');
+
+            // Automatically discover the best model for this new key in the background
+            const discovered = await fetchAvailableModelsForKey(rawKey);
+            if (discovered.length > 0) {
+                localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, discovered[0]);
+                loadSavedSettingsUI();
+            }
         }
 
         function selectActiveApiKey(id) {
@@ -917,18 +1184,27 @@
             if (dropdown.value === 'custom') {
                 customWrapper.classList.remove('hidden');
                 const customVal = document.getElementById('customModelIdInput').value.trim();
-                if (customVal) localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, customVal);
+                if (customVal) {
+                    localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, customVal);
+                    localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, customVal);
+                }
             } else {
                 customWrapper.classList.add('hidden');
                 localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, dropdown.value);
-                showToast(`Đã chọn mô hình: ${dropdown.value}`, 'info');
+                if (dropdown.value !== 'auto') {
+                    localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, dropdown.value);
+                }
+                showToast(`Đã chuyển chế độ Model: ${dropdown.value === 'auto' ? 'Tự động (Auto)' : dropdown.value}`, 'info');
             }
+            loadSavedSettingsUI();
         }
 
         function saveCustomModelId() {
             const val = document.getElementById('customModelIdInput').value.trim();
             if (val) {
                 localStorage.setItem(STORAGE_KEYS.SELECTED_MODEL, val);
+                localStorage.setItem(STORAGE_KEYS.CACHED_WORKING_MODEL, val);
+                loadSavedSettingsUI();
             }
         }
 
@@ -940,9 +1216,25 @@
             const headerBtn = document.getElementById('headerKeyStatusBtn');
             const headerDot = document.getElementById('headerKeyDot');
             const headerText = document.getElementById('headerKeyText');
+            const headerModelSubtext = document.getElementById('headerModelSubtext');
+            const resolvedBadge = document.getElementById('resolvedActiveModelBadge');
             const noKeyBanner = document.getElementById('noKeyWarningBanner');
 
             countBadge.textContent = `${keys.length} key`;
+
+            const modelSetting = getSelectedModelSetting();
+            const activeModelId = getInitialModelToTry();
+
+            if (headerModelSubtext) {
+                headerModelSubtext.textContent = modelSetting === 'auto'
+                    ? `Model: ${activeModelId} (Auto)`
+                    : `Model: ${activeModelId}`;
+            }
+            if (resolvedBadge) {
+                resolvedBadge.textContent = modelSetting === 'auto'
+                    ? `${activeModelId} (Tự động)`
+                    : activeModelId;
+            }
 
             // Update Top Header Status Badge & Banner
             if (activeObj) {
@@ -991,20 +1283,19 @@
             }
 
             // Sync Model Dropdown
-            const savedModel = getSelectedModelId();
             const dropdown = document.getElementById('modelSelectDropdown');
-            const presetModels = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'];
-            if (presetModels.includes(savedModel)) {
-                dropdown.value = savedModel;
+            const availableOptionValues = Array.from(dropdown.options).map(o => o.value);
+            if (availableOptionValues.includes(modelSetting)) {
+                dropdown.value = modelSetting;
                 document.getElementById('customModelInputWrapper').classList.add('hidden');
             } else {
                 dropdown.value = 'custom';
                 document.getElementById('customModelInputWrapper').classList.remove('hidden');
-                document.getElementById('customModelIdInput').value = savedModel;
+                document.getElementById('customModelIdInput').value = modelSetting;
             }
         }
 
-        // Test Active API Key Connectivity
+        // Test Active API Key Connectivity with Smart Auto-Fallback
         async function testActiveApiKey() {
             const activeObj = getActiveApiKeyObj();
             if (!activeObj) {
@@ -1014,26 +1305,16 @@
             const btn = document.getElementById('testKeyBtn');
             const originalHtml = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang thử...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang dò & thử Key...`;
 
             try {
-                const modelId = getSelectedModelId();
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${activeObj.key}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: 'Trả lời ngắn gọn: OK' }] }]
-                    })
-                });
-                const data = await response.json();
-                if (response.ok && data.candidates) {
-                    showToast(`Kết nối thành công với "${activeObj.label}" (${modelId})!`, 'success');
-                } else {
-                    const errMsg = data.error?.message || 'Key không hợp lệ hoặc model không hỗ trợ';
-                    showToast(`Lỗi API: ${errMsg}`, 'error');
-                }
+                const { usedModel } = await callGeminiWithAutoFallback(
+                    activeObj.key,
+                    { contents: [{ parts: [{ text: 'Trả lời ngắn gọn: OK' }] }] }
+                );
+                showToast(`Kết nối thành công với "${activeObj.label}" qua model: ${usedModel}!`, 'success');
             } catch (err) {
-                showToast('Lỗi mạng khi kết nối tới máy chủ Google Gemini.', 'error');
+                showToast(`Lỗi API: ${err.message}`, 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
@@ -1109,7 +1390,7 @@
         }
 
         /********************************************************************
-         * 7. GEMINI VISION API CALL FOR REPAIR ANALYSIS
+         * 7. GEMINI VISION API CALL FOR REPAIR ANALYSIS (WITH AUTO-FALLBACK)
          ********************************************************************/
         async function analyzePhoneImage() {
             if (!currentCompressedBase64) {
@@ -1125,11 +1406,11 @@
             }
 
             const userNotes = document.getElementById('techNotesInput').value.trim();
-            const modelId = getSelectedModelId();
 
             // Show Scanning UI State
             const analyzeBtn = document.getElementById('analyzeBtn');
             const loadingCard = document.getElementById('loadingStatusCard');
+            const loadingTitle = document.getElementById('loadingStepTitle');
             const laserOverlay = document.getElementById('scanLaserOverlay');
 
             analyzeBtn.disabled = true;
@@ -1141,57 +1422,61 @@ Hãy phân tích hình ảnh chiếc điện thoại này (có thể là mặt l
 
 Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không bọc trong markdown code block) theo đúng cấu trúc sau bằng tiếng Việt:
 {
-  "modelName": "Tên thương mại chính xác nhất của máy (VD: Samsung Galaxy S22 Ultra 5G hoặc iPhone 13 Pro Max)",
+  "modelName": "Tên thương mại chính xác nhất của máy (VD: Xiaomi Redmi Note 8 hoặc Samsung Galaxy S22 Ultra 5G)",
   "confidence": "Cao / Trung bình / Thấp",
-  "confidenceReason": "Giải thích ngắn gọn các đặc điểm nhận dạng trên ảnh (vị trí đèn flash, số lượng/hình dáng mắt camera, khung viền, mã in trên lưng/main...)",
-  "modelCodes": "Các mã model phần cứng phổ biến của dòng này (VD: SM-S908B, SM-S908N, A2643...)",
+  "confidenceReason": "Giải thích ngắn gọn các đặc điểm nhận dạng trên ảnh (logo Redmi/Samsung, vị trí cảm biến vân tay, cụm camera, khung viền...)",
+  "modelCodes": "Các mã model phần cứng phổ biến của dòng này (VD: M1908C3JG, SM-S908B...)",
   "repairGuide": {
     "entryMethod": "Hướng tháo mở máy chuẩn kỹ thuật (VD: Khò nhiệt tách Nắp Lưng sau HOẶC Tách từ Màn Hình trước)",
-    "heatTemp": "Nhiệt độ bàn nhiệt & thời gian khuyến nghị + dung dịch hỗ trợ (VD: 80°C - 90°C trong 2-3 phút, dùng cồn 99% tránh ố phản quang)",
-    "flexCableWarnings": "CẢNH BÁO CỰC KỲ QUAN TRỌNG về vị trí cáp vân tay, cáp màn hình, cáp phím âm lượng/nguồn hoặc cáp nối main-sub dễ bị cắt đứt khi lách mở máy",
-    "commonIssues": "Các pan bệnh phần cứng hay gặp trên dòng máy này (VD: xanh/trắng màn hình, hở chân CPU/RAM, lỗi IC sạc, chạm áp...)"
+    "heatTemp": "Nhiệt độ bàn nhiệt & thời gian khuyến nghị + dung dịch hỗ trợ (VD: 80°C - 90°C trong 2-3 phút, lưu ý màn IPS LCD tránh nhỏ cồn vào phản quang)",
+    "flexCableWarnings": "CẢNH BÁO CỰC KỲ QUAN TRỌNG về vị trí cáp vân tay mặt lưng, cáp màn hình, cáp phím âm lượng/nguồn hoặc cáp nối main-sub dễ bị đứt khi lách mở máy",
+    "disassemblySteps": [
+      "Bước 1: Tháo khay SIM đầu tiên và tắt nguồn hoàn toàn.",
+      "Bước 2: Gia nhiệt nắp lưng/màn hình ở nhiệt độ phù hợp...",
+      "Bước 3: Lưu ý nhấc nhẹ nắp lưng để tháo lồng sắt bảo vệ socket cáp vân tay trước khi nhấc hẳn nắp lưng ra.",
+      "Bước 4: Tháo ốc lồng main, cách ly socket Pin đầu tiên trước khi tháo cáp màn hình và camera."
+    ],
+    "commonIssues": "Các pan bệnh phần cứng hay gặp trên dòng máy này (VD: liệt cảm ứng, mất đèn màn hình, lỗi IC sóng/wifi, phù pin...)"
   },
   "specs": {
-    "display": "Loại tấm nền (AMOLED/OLED/IPS LCD - lưu ý có phản quang hay không), kích thước, tần số quét, màn phẳng hay cong",
-    "battery": "Dung lượng pin (mAh), mã pin (nếu biết), công suất sạc, loại chân sạc (cụm sạc rời hay hàn liền main)",
-    "hardware": "Vi xử lý (Chipset), RAM/ROM, cấu trúc mainboard (main 1 tầng hay 2 tầng ghép), chất liệu khung"
+    "display": "Loại tấm nền (IPS LCD có phản quang hay AMOLED/OLED), kích thước, độ phân giải, màn phẳng hay cong",
+    "battery": "Dung lượng pin (mAh), mã pin (VD: BN46, EB-BS908ABY), công suất sạc, loại chân sạc (Type-C hay Micro-USB)",
+    "hardware": "Vi xử lý (Chipset), RAM/ROM, cấu trúc mainboard, chất liệu mặt lưng & khung viền"
   },
   "similarModels": [
     {
       "name": "Tên dòng máy có ngoại hình gần giống dễ nhầm linh kiện",
-      "difference": "Cách phân biệt nhanh bằng mắt thường hoặc kích thước màn/vị trí lỗ mic/cam"
+      "difference": "Cách phân biệt nhanh bằng mắt thường hoặc kích thước màn/vị trí vân tay/camera"
     }
   ]
 }`;
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${activeKeyObj.key}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [
-                                { text: systemPrompt },
-                                {
-                                    inline_data: {
-                                        mime_type: 'image/jpeg',
-                                        data: currentCompressedBase64
-                                    }
+                const payload = {
+                    contents: [{
+                        parts: [
+                            { text: systemPrompt },
+                            {
+                                inline_data: {
+                                    mime_type: 'image/jpeg',
+                                    data: currentCompressedBase64
                                 }
-                            ]
-                        }],
-                        generationConfig: {
-                            temperature: 0.2,
-                            responseMimeType: 'application/json'
-                        }
-                    })
-                });
+                            }
+                        ]
+                    }],
+                    generationConfig: {
+                        temperature: 0.2,
+                        responseMimeType: 'application/json'
+                    }
+                };
 
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.error?.message || 'Lỗi khi gọi Gemini API');
-                }
+                const { data: result, usedModel } = await callGeminiWithAutoFallback(
+                    activeKeyObj.key,
+                    payload,
+                    (tryingModel) => {
+                        loadingTitle.textContent = `Đang phân tích ảnh qua AI (${tryingModel})...`;
+                    }
+                );
 
                 const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
                 const parsedData = parseGeminiJsonSafely(rawText);
@@ -1204,7 +1489,7 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
                 currentAnalysisData = parsedData;
                 renderAnalysisResult(parsedData);
                 saveScanToHistory(parsedData, currentThumbnailDataUrl);
-                showToast(`Đã nhận diện: ${parsedData.modelName}`, 'success');
+                showToast(`Đã nhận diện: ${parsedData.modelName} (${usedModel})`, 'success');
 
             } catch (error) {
                 showToast(`Lỗi phân tích: ${error.message}`, 'error');
@@ -1224,6 +1509,11 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
                 try {
                     return JSON.parse(cleaned);
                 } catch (err2) {
+                    // Attempt to extract first {...} block
+                    const match = cleaned.match(/\{[\s\S]*\}/);
+                    if (match) {
+                        try { return JSON.parse(match[0]); } catch (e3) { return null; }
+                    }
                     return null;
                 }
             }
@@ -1260,6 +1550,17 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
             document.getElementById('resHeatTemp').textContent = guide.heatTemp || '80°C - 85°C trong 2-3 phút';
             document.getElementById('resFlexWarnings').textContent = guide.flexCableWarnings || 'Chú ý cáp vân tay và cáp màn hình khi lách mở.';
             document.getElementById('resCommonIssues').textContent = guide.commonIssues || 'Chưa có ghi nhận đặc biệt.';
+
+            // Step-by-Step Disassembly Checklist
+            const stepsContainer = document.getElementById('resDisassemblySteps');
+            const steps = Array.isArray(guide.disassemblySteps) && guide.disassemblySteps.length > 0
+                ? guide.disassemblySteps
+                : [
+                    'Tháo khay SIM và tắt nguồn máy hoàn toàn trước khi tháo.',
+                    'Gia nhiệt đều phần viền theo nhiệt độ khuyến nghị, dùng miếng lách mỏng cẩn thận tránh vị trí cáp.',
+                    'Cách ly socket Pin đầu tiên ngay khi mở được lồng bảo vệ mainboard.'
+                ];
+            stepsContainer.innerHTML = steps.map(s => `<li class="pl-1">${escapeHtml(s.replace(/^Bước\s*\d+\s*:\s*/i, ''))}</li>`).join('');
 
             // 3. Hardware Specs
             const specs = data.specs || {};
@@ -1390,7 +1691,7 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
         }
 
         /********************************************************************
-         * 9. FOLLOW-UP REPAIR Q&A WITH GEMINI
+         * 9. FOLLOW-UP REPAIR Q&A WITH GEMINI (WITH AUTO-FALLBACK)
          ********************************************************************/
         function setQuickQuestion(qText) {
             document.getElementById('followUpInput').value = qText;
@@ -1433,17 +1734,12 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                const modelId = getSelectedModelId();
                 const prompt = `Bạn là giảng viên dạy sửa chữa điện thoại di động. Học viên đang tháo/sửa máy "${modelName}" (Mã: ${currentAnalysisData?.modelCodes || ''}) và hỏi: "${question}". Hãy trả lời ngắn gọn, súc tích, đi thẳng vào kỹ thuật thực tế (nhiệt độ, vị trí cáp/IC, kinh nghiệm tránh rủi ro) bằng tiếng Việt dễ hiểu.`;
 
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${activeKeyObj.key}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }]
-                    })
-                });
-                const data = await response.json();
+                const { data } = await callGeminiWithAutoFallback(
+                    activeKeyObj.key,
+                    { contents: [{ parts: [{ text: prompt }] }] }
+                );
                 const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Không nhận được phản hồi.';
 
                 const bubble = document.getElementById(loadingId);
@@ -1453,7 +1749,7 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
                 }
             } catch (e) {
                 const bubble = document.getElementById(loadingId);
-                if (bubble) bubble.innerHTML = `<span class="text-rose-400">Lỗi kết nối khi gửi câu hỏi.</span>`;
+                if (bubble) bubble.innerHTML = `<span class="text-rose-400">Lỗi: ${escapeHtml(e.message)}</span>`;
             } finally {
                 sendBtn.disabled = false;
                 chatBox.scrollTop = chatBox.scrollHeight;
@@ -1465,36 +1761,42 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
          ********************************************************************/
         function loadDemoAnalysis() {
             const sampleData = {
-                modelName: "Samsung Galaxy S22 Ultra 5G",
+                modelName: "Xiaomi Redmi Note 8",
                 confidence: "Cao (Bản Mẫu Demo)",
-                confidenceReason: "Nhận diện qua thiết kế vuông vức dòng Note, cụm 5 ống kính tách rời dạng giọt nước ở mặt lưng nhám và khe cắm bút S-Pen ở cạnh dưới.",
-                modelCodes: "SM-S908B, SM-S908E/DS, SM-S908U, SM-S908N",
+                confidenceReason: "Nhận diện qua mặt lưng kính chuyển sắc (Tím/Xanh), logo Redmi đặt dọc góc trái dưới, cụm 4 camera dọc góc trái và cảm biến vân tay tròn ở giữa mặt lưng.",
+                modelCodes: "M1908C3JG, M1908C3JH, M1908C3JE",
                 repairGuide: {
-                    entryMethod: "Khò nhiệt mở từ Nắp Lưng sau (Back Glass) — Tuyệt đối không cạy từ màn hình trước",
-                    heatTemp: "80°C - 90°C trên bàn nhiệt trong 2 - 3 phút, kết hợp nhỏ cồn 99% hoặc nước tách keo 530 để làm mềm keo zin chống nước.",
-                    flexCableWarnings: "CẢNH BÁO: Cáp phím Nguồn & Âm lượng nằm sát mép phải ngang cụm camera. Cáp nối Main-Sub và cáp màn hình đi dọc thân máy. Khi lách lá thép/nhựa chỉ đưa sâu tối đa 3-4mm.",
-                    commonIssues: "1. Trắng màn / Xanh màn hoặc sọc ngang ở tần số 120Hz (thường phải ép lại cổ cáp màn hình). 2. Báo ẩm chân sạc Type-C (thay bo sạc dưới). 3. Máy Hàn/Mỹ hay gặp lỗi mất sóng do hở chân trung tần hoặc cáp ăng-ten."
+                    entryMethod: "Khò nhiệt tách Nắp Lưng kính phía sau (Back Cover) trước",
+                    heatTemp: "80°C - 85°C trên bàn nhiệt trong 2 - 3 phút. Lưu ý màn hình dòng này là IPS LCD có phản quang nên hạn chế nhỏ quá nhiều cồn/530 tràn vào mép màn hình.",
+                    flexCableWarnings: "CẢNH BÁO ĐỨT CÁP: Có dây cáp Cảm Biến Vân Tay rất ngắn nối từ mặt lưng vào mainboard! Khi tách nắp lưng xong, TUYỆT ĐỐI không giật mạnh nắp lưng ra ngay mà phải mở nghiêng để tháo socket vân tay trước.",
+                    disassemblySteps: [
+                        "Tháo khay SIM và tắt nguồn máy hoàn toàn.",
+                        "Đặt mặt lưng lên bàn nhiệt 80°C trong 2 phút, dùng lá nhựa mỏng lách đều 4 cạnh nắp lưng (tránh đâm sâu vào giữa lưng nơi có cáp vân tay).",
+                        "Nghiêng nhẹ nắp lưng, tháo lồng sắt đè socket vân tay và ngắt kết nối cáp vân tay để tách rời nắp lưng.",
+                        "Tháo các ốc cố định lồng bảo vệ main, ngắt socket Pin (BN46) đầu tiên trước khi tháo cáp màn hình và cáp nối cụm sạc."
+                    ],
+                    commonIssues: "1. Liệt cảm ứng hoặc mất đèn màn hình do vào nước phần cổ cáp dưới cằm. 2. Lỗi mất sóng / Không có dịch vụ do chết IC công suất hoặc trung tần (SDR660). 3. Phù pin BN46 làm bung nắp lưng sau thời gian dài sử dụng."
                 },
                 specs: {
-                    display: "Dynamic AMOLED 2X 6.8 inch, QHD+ 120Hz, Màn hình cong 2 cạnh (Không có tấm phản quang rời - dùng cồn 99% an toàn)",
-                    battery: "5000 mAh (Mã pin: EB-BS908ABY), Sạc nhanh 45W, Cổng sạc Type-C nằm trên bo sạc rời dễ thay thế",
-                    hardware: "Snapdragon 8 Gen 1 / Exynos 2200, RAM 8GB/12GB, Bo mạch chủ (Main) cấu trúc 2 tầng ghép, khung nhôm Armor Aluminum"
+                    display: "IPS LCD 6.3 inch, Full HD+ (1080 x 2340), Có lớp phản quang (Cẩn thận khi dùng dung dịch tách keo)",
+                    battery: "4000 mAh (Mã pin: BN46), Sạc 18W, Chân sạc USB Type-C nằm trên cụm bo sạc rời bên dưới",
+                    hardware: "Qualcomm Snapdragon 665, RAM 4GB/6GB, Mainboard chữ C 1 tầng dễ sửa chữa, lưng kính Gorilla Glass 5"
                 },
                 similarModels: [
                     {
-                        name: "Samsung Galaxy S23 Ultra 5G",
-                        difference: "Viền vòng camera của S23 Ultra to và lồi hơn một chút, cạnh bên phẳng hơn S22 Ultra. Màn hình & khung không lắp lẫn cho nhau được."
+                        name: "Xiaomi Redmi Note 8T",
+                        difference: "Có thêm NFC, viền dưới (cằm) dày hơn một chút, khung màn hình không lắp chung hoàn toàn với Redmi Note 8 thường."
                     },
                     {
-                        name: "Samsung Galaxy S24 Ultra 5G",
-                        difference: "S24 Ultra dùng màn hình phẳng hoàn toàn và khung Titan, không cong 2 mép như S22 Ultra."
+                        name: "Xiaomi Redmi Note 7",
+                        difference: "Chỉ có cụm 2 camera sau thay vì 4 camera như Redmi Note 8, dùng mã pin BN4A khác với BN46."
                     }
                 ]
             };
 
             currentAnalysisData = sampleData;
             renderAnalysisResult(sampleData);
-            showToast('Đã nạp dữ liệu mẫu: Samsung Galaxy S22 Ultra 5G!', 'info');
+            showToast('Đã nạp dữ liệu mẫu: Xiaomi Redmi Note 8!', 'info');
         }
 
         /********************************************************************
@@ -1618,7 +1920,7 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
         }
 
         function updateManualSearchLinks() {
-            const val = document.getElementById('manualModelInput').value.trim() || 'iPhone 13 Pro Max';
+            const val = document.getElementById('manualModelInput').value.trim() || 'Redmi Note 8';
             renderPlatformLinksInto(val, 'manualLinksContainer');
         }
 
@@ -1647,7 +1949,7 @@ Hãy trả về kết quả DUY NHẤT dưới dạng JSON hợp lệ (không b�
         }
 
         function getServiceWorkerContent() {
-            return `const CACHE_NAME = 'phonefix-ai-v1';
+            return `const CACHE_NAME = 'phonefix-ai-v2';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', (event) => {
